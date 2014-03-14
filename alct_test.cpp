@@ -5126,6 +5126,27 @@ vga_done:
 	alct_nfailed[i]  = 0;
 	alct_nskipped[i] = 0;
 	}
+    
+    // Determine TMB firmware type
+    if  (id_rev_fpga==3||id_rev_fpga==4||id_rev_fpga==6) {
+        if (tmb_firmware_type==tmb_firmware_debug ) {
+            tmb_firmware_name = "Debug Loopback";	// Debug TMB type
+            printf("\n");
+            printf("\tTMB Firmware type = Debug Loopback");
+            printf("\tPLEASE Load TMB Normal Firmware for S6 Mezzanine Tests"); 
+        }
+        else if (tmb_firmware_type==tmb_firmware_normal) {
+            tmb_firmware_name = "Normal        ";	// Normal TMB type
+            printf("\n");
+            printf("\tTMB Firmware type = Normal");
+        }
+        else {
+        tmb_firmware_name = "TMB200x type unknown...beware";							// Unknown TMB type
+        printf("\n\tTMB Firmware type is UNKNOWN!!"); 
+        printf("\n\tEither firmware is not loaded, or something serious is wrong."); 
+        printf("\n\tCrate turned on? TMB in the right slot?"); 
+        }
+    }
 
 	printf("\n");
 	printf("\tAutomatic Spartan-6 Mezzanine Tests\n");
@@ -5912,6 +5933,28 @@ alct_sc_done:
 start_lbtest:
 	printf("\n");
 	printf("\tStarting ALCT-TMB Loopback Tests\n");
+    //
+    // Determine TMB firmware type
+    if  (id_rev_fpga==3||id_rev_fpga==4||id_rev_fpga==6) {
+        if (tmb_firmware_type==tmb_firmware_debug ) {
+            tmb_firmware_name = "Debug Loopback";	// Debug TMB type
+            printf("\n");
+            printf("\tTMB Firmware type = Debug Loopback");
+            printf("\tPLEASE Load TMB Normal Firmware for S6 Mezzanine Tests"); 
+        }
+        else if (tmb_firmware_type==tmb_firmware_normal) {
+            tmb_firmware_name = "Normal        ";	// Normal TMB type
+            printf("\n");
+            printf("\tTMB Firmware type = Normal");
+        }
+        else {
+        tmb_firmware_name = "TMB200x type unknown...beware";							// Unknown TMB type
+        printf("\n\tTMB Firmware type is UNKNOWN!!"); 
+        printf("\n\tEither firmware is not loaded, or something serious is wrong."); 
+        printf("\n\tCrate turned on? TMB in the right slot?"); 
+        }
+    }
+
 	printf("\n");
 	printf("\tRemove ribbon cable\n");
 	printf("\tConnect J5 SCSI cable\n");
@@ -5934,13 +5977,13 @@ skip_lb:
 run_lbtest:
 	itest=81;
 	
-	status  = vme_read(boot_adr,rd_data);			// Get current boot reg
-	wr_data = rd_data | 0x0100;						// Hard reset ALCT to check that FPGAs load from PROMs automatically
-	status  = vme_write(boot_adr,wr_data);			// Assert   ALCT hard reset
+	status  = vme_read(boot_adr,rd_data);			        // Get current boot reg
+	wr_data = rd_data | 0x0100;						        // Hard reset ALCT to check that FPGAs load from PROMs automatically
+	status  = vme_write(boot_adr,wr_data);			        // Assert   ALCT hard reset
 
-	wr_data = rd_data & ~0x0100;					// Turn off ACLT hard reset
-	status  = vme_write(boot_adr,wr_data);			// Restore boot reg
-	sleep(1000);									// Wait for ALCT to reload
+	wr_data = rd_data & ~0x0100;					        // Turn off ACLT hard reset
+	status  = vme_write(boot_adr,wr_data);			        // Restore boot reg
+	sleep(1000);									        // Wait for ALCT to reload
 
 	adr     = boot_adr;										// Boot register address
 	ichain  = 0x00;											// ALCT Mezzanine control user jtag chain

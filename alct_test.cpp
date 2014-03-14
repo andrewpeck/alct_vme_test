@@ -1629,6 +1629,7 @@
 	char			cbid[4+1];
 	string			sbid;
 	int				lenv;
+    char            alct_logfolder[81];
 	char			tmb_logfolder[81];
 	char			rat_logfolder[81];
 
@@ -1805,6 +1806,7 @@
 	string			smez_board_id;
 
 	FILE*			test_file=NULL;
+    string          logfolder;
 	string			test_file_name;
 
 	int				alct_npass=0;
@@ -5176,8 +5178,24 @@ vga_done:
 	for (iver=1; iver<=99; ++iver) {
 	sprintf(cfver,"%2.2i",iver);
 
+
+    Check for log file environment variable
+        lenv = 81;
+    lenv = ExpandEnvironmentStrings("%ALCT_LogFolder%",alct_logfolder,lenv);
+    logfolder = string(tmb_logfolder);
+        
+    if (lenv==0 || logfolder.compare("%ALCT_LogFolder%")==0) {
+        printf("\n");
+        printf("\tSystem Environment Variable ALCT_LogFolder not defined.\n");
+        printf("\tSuggest you set ALCT_LogFolder=D:\\ALCT2011\\Testlogs\\ in System Properties/Advanced\n");
+        printf("\tChanges take effect after reboot or user logoff/logon\n");
+        printf("\n");}
+    else {
+        printf("\tEnvironment variable ALCT_LogFolder=%s\n",alct_logfolder);
+    }
+
 	sfver=string(cfver);
-	test_file_name = "D:\\ALCT2011\\Test Logs\\";
+    test_file_name = logfolder;
 	test_file_name = test_file_name+"alct_"+salct_board_id+"_mez_"+smez_board_id+"_ver"+sfver+".txt";
 
 	test_file = fopen(test_file_name.c_str(),"r");	// Check if this version already exists

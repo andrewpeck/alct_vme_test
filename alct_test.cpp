@@ -5152,10 +5152,10 @@ vga_done:
 	printf("\tAutomatic Spartan-6 Mezzanine Tests\n");
 	printf("\n");
 	printf("\tDisconnect JTAG Ribbon cable\n");
-	printf("\tConnect    J4   SCSI   cable\n");
-	printf("\tConnect    J5   Ribbon cable\n");
+	printf("\tConnect    J4   SCSI   cable to RAT Board\n");
+	printf("\tConnect    J5   SCSI-to-parallel cable\n");
 	printf("\n");
-	printf("\tVerify Shunt SW1 is on 2-3 to enable the clock\n");
+	printf("\tVerify Shunt SW1 is on 2-3 to enable the clock from SCSI\n");
 	printf("\tVerify Shunt SW3 is removed\n");
 	printf("\n");
 

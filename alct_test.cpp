@@ -6669,7 +6669,7 @@ rx_scan:
 	fprintf(stdout,"\t%2i ALCT txd clock delay scan: Width=%2i Center=%2i    %s\n",
 	itest, window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay],spass_fail[ipf].c_str());
 
-	fprintf(test_file,"%2i ALCT rxd clock delay scan: Width=%2i Center=%2i    %s\n",
+	fprintf(test_file,"%2i ALCT txd clock delay scan: Width=%2i Center=%2i    %s\n",
 	itest, window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay],spass_fail[ipf].c_str());
 
 // Display timing window twice in case good area is near 0 or 25ns

@@ -66,6 +66,9 @@
 	if ((idcode & 0xFFFFFFFF) == 0x3401D093) {sdevice_name = "XC6SLX150";	sdevice_version = "BIV"; sdevice_type="FPGA"; sdevice_size="150K";}
 	if ((idcode & 0xFFFFFFFF) == 0x4401D093) {sdevice_name = "XC6SLX150";	sdevice_version = "CIV"; sdevice_type="FPGA"; sdevice_size="150K";}
 
+	if ((idcode & 0x0FFFFFFF) == 0x04011093) {sdevice_name = "XC6SLX100";	sdevice_version = "UNK"; sdevice_type="FPGA"; sdevice_size="100K";}
+	if ((idcode & 0x0FFFFFFF) == 0x0403D093) {sdevice_name = "XC6SLX150T";	sdevice_version = "UNK"; sdevice_type="FPGA"; sdevice_size="150K";}
+
 	if ((idcode & 0x0FFFFFFF) == 0x0041C093) {sdevice_name = "XCS40XL";		sdevice_version = "UNK"; sdevice_type="FPGA"; sdevice_size="2K  ";}
 	if ((idcode & 0xFFFFFFFF) == 0x0041C093) {sdevice_name = "XCS40XL";		sdevice_version = "AKP"; sdevice_type="FPGA"; sdevice_size="2K  ";}
 	if ((idcode & 0xFFFFFFFF) == 0x0041C093) {sdevice_name = "XCS40XL";		sdevice_version = "AKP"; sdevice_type="FPGA"; sdevice_size="2K  ";}

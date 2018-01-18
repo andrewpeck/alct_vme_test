@@ -77,6 +77,7 @@
     #include <sys/stat.h>
     #include <iostream>
     #include <string>
+    #include <vector>
     using namespace std;
 
 //------------------------------------------------------------------------------
@@ -99,9 +100,9 @@
     const int       mxcfeb      = 5;    // # CFEBs
     const int       mxbitstream = 1000; // Max # bits in a jtag cycle
 
-    inline int mxadbs() {return alct_type==ALCT288 ? 18 : alct_type==ALCT384 ? 24 : alct_type==ALCT672 ? 42 : -1}; // Number of AFEBs;
-    inline int mxadcs() {return alct_type==ALCT288 ?  3 : alct_type==ALCT384 ?  3 : alct_type==ALCT672 ?  5 : -1}; // Number of DACs
-    inline int mxdacs() {return adcs()-1};                                                                         // number of dacs always equal to number of adcs-1
+    inline int mxadbs() {return alct_type==ALCT288 ? 18 : alct_type==ALCT384 ? 24 : alct_type==ALCT672 ? 42 : -1;} // Number of AFEBs;
+    inline int mxadcs() {return alct_type==ALCT288 ?  3 : alct_type==ALCT384 ?  3 : alct_type==ALCT672 ?  5 : -1;} // Number of DACs
+    inline int mxdacs() {return mxadcs()-1;}                                                                       // number of dacs always equal to number of adcs-1
 
 // Common/decode_readout_common/
     int             scp_tbins;
@@ -154,6 +155,7 @@
     double          vref;
 
 // Common/adc_common_mez/
+    double          adc_voltage_mez[14];
     double          v3p3_mez;
     double          v2p5_mez;
     double          vcore_mez;
@@ -467,6 +469,9 @@
     int             count0s         (char tdo[], int &nbits);
     int             count1s         (char tdo[], int &nbits);
 
+    int             iadc_for_adb    (int adb, bool return_channel); 
+    int             idac_for_adb    (int adb, bool return_channel); 
+
     void            inquire         (string prompt, const int &minv, const int &maxv, const int &radix, int &now);
     void            inquir2         (string prompt, const int &minv, const int &maxv, const int &radix, int &num, int &now);
     void            inquirl         (string prompt, const int &minv, const int &maxv, const int &radix, long int &now);
@@ -491,6 +496,10 @@
     void            vme_jtag_write_ir       (unsigned long &adr, int &ichain, int &chip_id, int &opcode);
     void            vme_jtag_write_dr       (unsigned long &adr, int &ichain, int &chip_id, char wr_data[], char rd_data[], int &nbits);
     bool            vme_jtag_cable_detect   (unsigned long &base_adr);
+
+    int             get_alct_fpga_type        (); 
+    std::string     get_alct_fpga_type_string (); 
+
 
 //------------------------------------------------------------------------------
 // File scope declarations
@@ -1733,7 +1742,6 @@
     int             alct_end_marker;
     int             alct_end_header;
     int             alct_unass;
-    int             alct_type;
     int             alct_month;
     int             alct_day;
     int             alct_year;
@@ -1814,7 +1822,6 @@
     string          smez_board_id;
 
     FILE*           test_file=NULL;
-    string          logfolder;
     string          test_file_name;
 
     int             alct_npass=0;
@@ -1832,6 +1839,17 @@
     double          tfpga_mez_f;
     double          tsink_mez_f;
     double          tgbtx_mez_f;
+
+    std::vector<double> voltages;
+    std::vector<double> temperatures;
+    std::vector<int>    adc_errs;
+    std::vector<int>    voltages_errs;
+    std::vector<int>    temperatures_errs;
+    std::vector<std::string>    voltages_text;
+    std::vector<std::string>    temperatures_text;
+
+
+    int err_last; 
 
     int             idac_table;
     const int       ndac_table=25;
@@ -2679,7 +2697,7 @@ L10610:
 
 // Display Spartan-6 mezzanine ADC
 
-    int alct_type = get_alct_fpga_type();
+    int alct_fpga_type = get_alct_fpga_type();
 
     fprintf(stdout,"\n");
     fprintf(stdout,"\tSpartan6 ADC\n");
@@ -2689,17 +2707,17 @@ L10610:
     fprintf(stdout,"\t+1.8   Vccprom  %6.3f V\n",v1p8_mez);
     fprintf(stdout,"\t+1.2   Vccint   %6.3f V\n",v1p2_mez);
 
-    if (alct_type==0x1506)
+    if (alct_fpga_type==0x1506)
     {
     fprintf(stdout,"\t+Tsink          %6.3f C  %5.1f F\n",tsink_mez,(32.+tsink_mez*9./5.));
     }
-    else if (alct_type==0x1006)
+    else if (alct_fpga_type==0x1006)
     {
     fprintf(stdout,"\t+1.5   VccGBT   %6.3f V\n",v1p5_mez);
     fprintf(stdout,"\t+VRSSI          %6.3f V\n",vgbtx_rssi);
     fprintf(stdout,"\t+Tgbtx          %6.3f C  %5.1f F\n",tgbtx_mez,(32.+tgbtx_mez*9./5.));
     }
-    else if (alct_type == 0x1516)
+    else if (alct_fpga_type == 0x1516)
     {
     fprintf(stdout,"\t+1.2   MGT      %6.3f V\n",v1p2_mgt);
     fprintf(stdout,"\t+Tsink          %6.3f C  %5.1f F\n",tsink_mez,(32.+tsink_mez*9./5.));
@@ -2838,7 +2856,7 @@ L1200:
 //  ichain = 0x03;                                          // ALCT Virtex-E mezzanine jtag chain
     ichain = 0x13;                                          // ALCT Spartan-6 mezzanine jtag chain
 
-    if (get_alct_fpga_type()=="0x1006") // LX100 only has an XCF32P (nchips=2)
+    if (get_alct_fpga_type()==0x1006) // LX100 only has an XCF32P (nchips=2)
         nchips = 2;
     else
         nchips = 3;
@@ -5151,8 +5169,8 @@ vga_done:
     sprintf(cfver,"%2.2i",iver);
 
 
-    Check for log file environment variable
-        lenv = 81;
+// Check for log file environment variable
+    lenv = 81;
     lenv = ExpandEnvironmentStrings("%ALCT_LogFolder%",alct_logfolder,lenv);
     logfolder = string(tmb_logfolder);
 
@@ -5230,15 +5248,9 @@ start_sctest:
 
     //fprintf(stdout,"\ttdo="); for (i=0; i<reg_len; ++i) fprintf(stdout,"%1i",tdo[i]); fprintf(stdout,"\n");
 
-    long alct_fpga = get_alct_fpga_type();
+    long int alct_fpga = get_alct_fpga_type(); 
 
-    tdi_to_i4(&tdo[0],alct_fpga,reg_len,0);
-
-    if      (alct_fpga==0x600E) salct_fpga = "Virtex-E";
-    else if (alct_fpga==0x1506) salct_fpga = "Spartan-6 LX150";
-    else if (alct_fpga==0x1516) salct_fpga = "Spartan-6 LX150T";
-    else if (alct_fpga==0x1006) salct_fpga = "Spartan-6 LX100";
-    else                        salct_fpga = "Unknown";
+    salct_fpga = get_alct_fpga_type_string(); 
 
     if (salct_fpga=="Spartan-6 LX150" || salct_fpga=="Spartan-6 LX150T"|| salct_fpga=="Spartan-6 LX100")
         {alct_npassed[itest]=1; ipf=0;}
@@ -5362,65 +5374,65 @@ start_sctest:
     tsink_mez_f = (32.+tsink_mez*9./5.);
     tgbtx_mez_f = (32.+tgbtx_mez*9./5.);
 
-    std::vector<double> voltages;
-    std::vector<double> temperatures;
-    std::vector<int>    adc_errs;
-    std::vector<std::string>    voltages_text;
-    std::vector<std::string>    temperatures_text;
-    std::vector<std::string>    voltages_errs;
-    std::vector<std::string>    temperatures_errs;
+    voltages.clear();
+    temperatures.clear();
+    adc_errs.clear();
+    voltages_errs.clear();
+    temperatures_errs.clear();
+    voltages_text.clear();
+    temperatures_text.clear();
 
-    int err_last;
+    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v3p3_mez)  ; voltages_text.push_back("+3.3   Vcc    ") ;
+    tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v2p5_mez)  ; voltages_text.push_back("+2.5   Vccaux ") ;
+    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(vcore_mez) ; voltages_text.push_back("+1.8   Vcore  ") ;
+    tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p8_mez)  ; voltages_text.push_back("+1.8   Vccprom") ;
+    tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p2_mez)  ; voltages_text.push_back("+1.2   Vccint ") ;
 
-    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last) ; voltages_err.push_back (err_last) ; voltages.push_back(v3p3_mez)  ; voltages_text.push_back("+3.3   Vcc    ") ;
-    tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last) ; voltages_err.push_back (err_last) ; voltages.push_back(v2p5_mez)  ; voltages_text.push_back("+2.5   Vccaux ") ;
-    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0250, err_last) ; voltages_err.push_back (err_last) ; voltages.push_back(vcore_mez) ; voltages_text.push_back("+1.8   Vcore  ") ;
-    tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last) ; voltages_err.push_back (err_last) ; voltages.push_back(v1p8_mez)  ; voltages_text.push_back("+1.8   Vccprom") ;
-    tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last) ; voltages_err.push_back (err_last) ; voltages.push_back(v1p2_mez)  ; voltages_text.push_back("+1.2   Vccint ") ;
+    long int alct_fpga_type = get_alct_fpga_type(); 
 
-    if (alct_type==0x1506) // S-6 150
+    if (alct_fpga_type==0x1506) // S-6 150
     {
-    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); temperatures_errs.push_back(err_last); temperatures.push_back(tsink_mez_f); temperatures_text.push_back("+Temp  TSink  ")
+    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); temperatures_errs.push_back(err_last); temperatures.push_back(tsink_mez_f); temperatures_text.push_back("+Temp  TSink  ");
     }
-    else if (alct_type==0x1006)
+    else if (alct_fpga_type==0x1006)
     {
     tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5_mez)      ; voltages_text.push_back("+1.2   Vccint ")     ;
     tok("RSSI      S6 Mez ", vgbtx_rssi, 1.00,  0.1,     err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vgbtx_rssi)    ; voltages_text.push_back("+1.2   Vccint ")     ;
-    tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez) ; temperatures_text.push_back("+Tenp  TGBTX  ")
+    tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez) ; temperatures_text.push_back("+Tenp  TGBTX  ");
     }
-    else if (alct_type==0x1516)
+    else if (alct_fpga_type==0x1516)
     {
     tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vcore_mez  )     ; voltages_text.push_back("+1.2   Vccint ")     ;
-    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back("+Temp  TSink  ")
+    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back("+Temp  TSink  ");
     }
 
-    tok("Tfpga     S6 Mez " , tfpga_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; voltages.push_back(tfpga_mez_f) ; temperatures_tex.push_back     ("+Temp  TFpga  ") ;
+    tok("Tfpga     S6 Mez " , tfpga_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; voltages.push_back(tfpga_mez_f) ; temperatures_text.push_back     ("+Temp  TFpga  ") ;
 
     tok("+vref/2 S6 Mez ", vref2_mez,   1.250,       .0010,     err_last) ; voltages_errs.push_back(err_last) ; voltages.push_back(vref2_mez) ; voltages_text.push_back("+vref/2 1.25V ") ;
     tok("+vzero  S6 Mez ", vzero_mez,   0.0,         .0010,     err_last) ; voltages_errs.push_back(err_last) ; voltages.push_back(vzero_mez) ; voltages_text.push_back("+vzero  0.00V ") ;
     tok("+vref   S6 Mez ", vref_mez,    2.499,       .0010,     err_last) ; voltages_errs.push_back(err_last) ; voltages.push_back(vref_mez ) ; voltages_text.push_back("+vref   2.50V ") ;
 
-    for (int i=0; i<voltages.length(); i++) {
-        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i], voltages[i], spass_fail[voltage_errs[i]].c_str());
-        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i], voltages[i], spass_fail[voltage_errs[i]].c_str());
+    for (i=0; i<int(voltages.size()); i++) {
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i], voltages[i], spass_fail[voltages_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i], voltages[i], spass_fail[voltages_errs[i]].c_str());
         itest++;
     }
 
-    for (int i=0; i<temperatures.length(); i++) {
-        fprintf(stdout,    "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i], temperatures[i],  spass_fail[temperatures_err[i]].c_str());
-        fprintf(test_file, "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i], temperatures[i],  spass_fail[temperatures_err[i]].c_str());
+    for (i=0; i<int(temperatures.size()); i++) {
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i], temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i], temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
         itest++;
     }
 
     itest=7;
 
-    for (i=0; i<=voltages_errs.length(); ++i)
+    for (i=0; i<=int(voltages_errs.size()); ++i)
     {
         if (voltages_errs[i]==0) alct_npassed[itest+i]=1;
         else                     alct_nfailed[itest+i]=1;
     }
 
-    for (i=0; i<=temperatures_errs.length(); ++i)
+    for (i=0; i<=int(temperatures_errs.size()); ++i)
     {
         if (temperatures_errs[i]==0) alct_npassed[itest+i]=1;
         else                         alct_nfailed[itest+i]=1;
@@ -5431,7 +5443,7 @@ start_sctest:
 
     ichain = 0x13;                                          // ALCT Spartan-6 mezzanine jtag chain
 
-    if (get_alct_fpga_type()=="0x1006") // LX100 only has an XCF32P (nchips=2)
+    if (get_alct_fpga_type()==0x1006) // LX100 only has an XCF32P (nchips=2)
         nchips = 2;
     else
         nchips = 3;
@@ -6108,9 +6120,9 @@ run_lbtest:
     tsink_mez_f = (32.+tsink_mez*9./5.);
     tgbtx_mez_f = (32.+tgbtx_mez*9./5.);
 
-    std::vector<double> voltages;
-    std::vector<double> temperatures;
-    std::vector<int>    adc_errs;
+    voltages.clear();
+    temperatures.clear();
+    adc_errs.clear();
 
     int err_last;
 
@@ -6120,17 +6132,17 @@ run_lbtest:
     tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last); adc_errs.push_back (err_last); voltages.push_back(v1p8_mez);
     tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last); adc_errs.push_back (err_last); voltages.push_back(v1p2_mez);
 
-    if (alct_type==0x1506) // S-6 150
+    if (alct_fpga_type==0x1506) // S-6 150
     {
     tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); adc_errs.push_back(err_last); temperatures.push_back(tsink_mez_f);
     }
-    else if (alct_type==0x1006)
+    else if (alct_fpga_type==0x1006)
     {
     tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last); adc_errs.push_back(err_last); voltages.push_back(v1p5_mez);
     tok("RSSI      S6 Mez ", vgbtx_rssi, 1.00,  0.1,     err_last); adc_errs.push_back(err_last); voltages.push_back(vgbtx_rssi);
     tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last); adc_errs.push_back(err_last); temperatures.push_back(tgbtx_mez);
     }
-    else if (alct_type==0x1516)
+    else if (alct_fpga_type==0x1516)
     {
     tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last); adc_errs.push_back(err_last); voltages.push_back(vcore_mez  );
     tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last); adc_errs.push_back(err_last); voltages.push_back(tsink_mez_f);
@@ -6143,22 +6155,22 @@ run_lbtest:
     tok("+vref   S6 Mez ", vref_mez,    2.499,       .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vref_mez );
 
     ipf=0;
-    for (i=0; i<=adc_errs.len(); ++i)
+    for (i=0; i<=int(adc_errs.size()); ++i)
         if (adc_errs[i]!=0) ipf=1;
 
     if (ipf==0) alct_npassed[itest]=1;
     else        alct_nfailed[itest]=1;
 
     fprintf(stdout, "\t%2i Spartan6 ADC");
-    for (i=0; i<=voltages.len(); ++i)
+    for (i=0; i<=int(voltages.size()); ++i)
         fprintf(stdout, " %3.1fV", voltages[i]);
-    for (i=0; i<=temperatures.len(); ++i)
+    for (i=0; i<=int(temperatures.size()); ++i)
         fprintf(stdout, " %3.0fF", temperatures[i]);
 
     fprintf(test_file, "\t%2i Spartan6 ADC");
-    for (i=0; i<=voltages.len(); ++i)
+    for (i=0; i<=int(voltages.size()); ++i)
         fprintf(test_file, " %3.1fV", voltages[i]);
-    for (i=0; i<=temperatures.len(); ++i)
+    for (i=0; i<=int(temperatures.size()); ++i)
         fprintf(test_file, " %3.0fF", temperatures[i]);
 
 //------------------------------------------------------------------------------
@@ -8380,7 +8392,7 @@ int iadc_for_adb (int adb, bool return_channel) {
 
     // compensate for the fact that the 288 and 384 have 3 ADCs instead
     // of 5 but otherwise share the same mapping
-    if (alct_type=ALCT288 || alct_type==ALCT384) {
+    if (alct_type==ALCT288 || alct_type==ALCT384) {
         iadc = iadc-2;
     }
 
@@ -8412,7 +8424,7 @@ int idac_for_adb (int adb, bool return_channel) {
 int get_alct_fpga_type () {
 
     int ichain  = 0x2;                                          // ALCT Mezzanine control jtag chain
-    int adr     = boot_adr;                                     // Boot register address
+    unsigned long adr = boot_adr;                                     // Boot register address
     int chip_id = 0;                                            // ALCT user path has 1 chip
 
     // Create fat 0 for writing to data registers
@@ -8429,11 +8441,21 @@ int get_alct_fpga_type () {
 
     //fprintf(stdout,"\ttdo="); for (i=0; i<reg_len; ++i) fprintf(stdout,"%1i",tdo[i]); fprintf(stdout,"\n");
 
-    int alct_fpga;
+    long alct_fpga;
     tdi_to_i4(&tdo[0],alct_fpga,reg_len,0);
 
     return alct_fpga;
 
+}
+std::string get_alct_fpga_type_string () {
+
+    long alct_fpga = get_alct_fpga_type();
+
+    if      (alct_fpga==0x600E) return "Virtex-E";
+    else if (alct_fpga==0x1506) return "Spartan-6 LX150";
+    else if (alct_fpga==0x1516) return "Spartan-6 LX150T";
+    else if (alct_fpga==0x1006) return "Spartan-6 LX100";
+    else                        return "Unknown";
 }
 //------------------------------------------------------------------------------
 // The bitter end

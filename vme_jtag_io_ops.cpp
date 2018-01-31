@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 	#include <stdio.h>
 	#include <iostream>
+    #include <windows.h>
 	using namespace std;
 
 //------------------------------------------------------------------------------
@@ -99,7 +100,7 @@
 	int			ibit;
 	int			bit;
 
-	if (nbits > 32) pause("tdi_to_i4: nbits>32 wtf?");
+    if (nbits > 32) pause("tdi_to_i4: nbits>32 wtf?");
 
 	if(spi==0) {				// Translate lsb first
 	i4_copy=0;
@@ -119,6 +120,37 @@
 
 	#ifdef debug_jtag_io_ops
 	fprintf(log_file,"tdi_to_i4: i4=%8.8X nbits=%4i spi=%1i tdi=",i4,nbits,spi); 
+	for (int i=0; i<nbits; ++i) fprintf(log_file,"%1i",tdi[i]); fprintf(log_file,"\n");
+	#endif
+
+	return;
+}
+	void tdi_to_i4(char tdi[], long long &i4, const int &nbits,  const int &spi)
+{
+	long long       i4_copy;
+	int		    	ibit;
+	int		    	bit;
+
+    if (nbits > 64) pause("tdi_to_i4: nbits>64 wtf?");
+
+	if(spi==0) {				// Translate lsb first
+	i4_copy=0;
+	for (ibit=0; ibit<nbits; ++ibit) {
+	bit=tdi[ibit] & UINT64(1);
+	i4_copy=i4_copy | (bit*(UINT64(1) << ibit));
+	}}
+
+	else {						// Translate msb first
+	i4_copy=0;
+	for (ibit=0; ibit<nbits; ++ibit) {
+	bit=tdi[nbits-1-ibit] & UINT64(1);
+	i4_copy=i4_copy | bit*(UINT64(1) << ibit);
+	}}
+
+	i4=i4_copy;
+
+	#ifdef debug_jtag_io_ops
+	fprintf(log_file,"tdi_to_i4: i4=%12.12llx nbits=%4i spi=%1i tdi=",i4,nbits,spi); 
 	for (int i=0; i<nbits; ++i) fprintf(log_file,"%1i",tdi[i]); fprintf(log_file,"\n");
 	#endif
 

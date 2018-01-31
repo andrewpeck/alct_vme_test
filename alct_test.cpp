@@ -485,7 +485,8 @@
     long int        vme_errs        (const int &print_mode);
 
     void            i4_to_tdi       (long int &i4, char  tdi[], const int &nbits, const int &spi);
-    void            tdi_to_i4       (char  tdi[], long int &i4, const int &nbits, const int &spi);
+    void            tdi_to_i4       (char  tdi[], long int  &i4, const int &nbits, const int &spi);
+    void            tdi_to_i4       (char  tdi[], long long &i4, const int &nbits, const int &spi);
     void            bit_to_array    (const int &idata, int iarray[], const int &n);
 
     int             xsvfExecute     ();
@@ -613,8 +614,8 @@
     long            alct_todd;
     long            alct_teven;
     long            alct_crc_err;
-    long            adb_hit;
-    long            adb_hit_expect;
+    long long       adb_hit;
+    long long       adb_hit_expect;
 
     string          salct_fpga;
     string          sok;
@@ -3368,7 +3369,7 @@ adb_hit_loop:
 
     tdi_to_i4(&tdo[0],adb_hit,reg_len,0);
 
-    adb_hit_expect = (1<<adb_wr_ch);
+    adb_hit_expect = UINT64(1)<<adb_wr_ch;
 
     if       (adb_hit==adb_hit_expect)          sok="OK";   // ADB with hits should match selected ADB
     else if ((adb_hit==0) && (scsi_wr_data==0)) sok="OK";   // Unless the tx data is 0
@@ -3377,11 +3378,11 @@ adb_hit_loop:
     if (sok=="OK")  alct_npassed[itest]++;
     if (sok=="ERR") alct_nfailed[itest]++;
 
-    if (iprint)      printf("\tADB=%2i Connectors hit  %6.6X %s\n",adb_wr_ch,adb_hit,sok.c_str());\
+    if (iprint)      printf("\tADB=%2i Connectors hit  %011llx %s\n",adb_wr_ch,adb_hit,sok.c_str());\
 
     if (sok=="ERR") {printf("\n");
-                     printf("\tADB=%2i Connectors hit  %6.6X %s\n",adb_wr_ch,adb_hit,sok.c_str());
-                     printf("\tADB=%2i Expected        %6.6X   \n",adb_wr_ch,adb_hit_expect);
+                     printf("\tADB=%2i Connectors hit  %011llx %s\n",adb_wr_ch,adb_hit,sok.c_str());
+                     printf("\tADB=%2i Expected        %011llx   \n",adb_wr_ch,adb_hit_expect);
                      printf("\tADB connector hit error: Skip Retry Exit [R]");
                      gets(line);
                      if (line[0]==NULL)                 goto adb_hit_loop;      // Default Retry
@@ -3393,7 +3394,7 @@ adb_hit_loop:
 // All-tests mode display
     if (!iprint)
     {
-    printf("\tADB=%2i test=%1i pass=%2i sent=0x%4.4X received=0x%4.4X ADBlist=%6.6X expected=%6.6X\r",
+    printf("\tADB=%2i test=%1i pass=%2i sent=0x%4.4X received=0x%4.4X ADBlist=%011llx expected=%011llx\r",
     adb_wr_ch, itest, ipass, scsi_wr_data, adb_rd_data, adb_hit, adb_hit_expect);
     if (!adb_auto && alct_nfailed[itest]!=0) pause(" ERROR");
     }
@@ -5873,18 +5874,19 @@ adb_hit_loop_sc:                                            // Read ADB hit list
                 vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write 0's read tdo
                 tdi_to_i4(&tdo[0],adb_hit,reg_len,0);
 
-                adb_hit_expect = (1<<adb_wr_ch);
+                adb_hit_expect = UINT64(1)<<adb_wr_ch;
+
                 if       (adb_hit==adb_hit_expect)          sok="OK";   // ADB with hits should match selected ADB
                 else if ((adb_hit==0) && (scsi_wr_data==0)) sok="OK";   // Unless the tx data is 0
                 else                                        sok="ERR";  // Otherwise fail
 
-                printf("\tADB=%2i test=%1i pass=%2i tx=0x%4.4X rx=0x%4.4X adblist=%6.6X expect=%6.6X\r",
+                printf("\tADB=%2i test=%1i pass=%2i tx=0x%4.4X rx=0x%4.4X adblist=%011llx expect=%011llx\r",
                         adb_wr_ch, itest_sc, ipass, scsi_wr_data, adb_rd_data, adb_hit, adb_hit_expect);
 
                 if (sok=="OK")  alct_npassed_sc[itest]++;
                 if (sok=="ERR") {printf("\n");
-                    printf("\tADB=%2i Connectors hit  %6.6X %s\n",adb_wr_ch,adb_hit,sok.c_str());
-                    printf("\tADB=%2i Expected        %6.6X   \n",adb_wr_ch,adb_hit_expect);
+                    printf("\tADB=%2i Connectors hit  %011llx %s\n",adb_wr_ch,adb_hit,sok.c_str());
+                    printf("\tADB=%2i Expected        %011llx   \n",adb_wr_ch,adb_hit_expect);
                     printf("\tADB connector hit error: skip|retry|exit [r]");
                     gets(line);
                     if (line[0]==NULL)                 goto adb_hit_loop_sc;       // Default Retry

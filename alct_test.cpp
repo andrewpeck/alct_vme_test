@@ -2208,6 +2208,7 @@ main_menu:
     printf("\t18:  Slow Control Normal Firmware Submenu\n");
     printf("\t19:  Automatic Spartan-6 Mezzanine Tests\n");
     printf("\t20:  Peek/Poke ALCT SC-Test JTAG Register\n");
+    printf("\t21:  Write/Read ALCT Delay ASICs\n");
     printf("\t<cr> Exit\n");
     printf("       > ");
 
@@ -2234,6 +2235,7 @@ main_menu:
     if (i==18) {void L1800();   L1800();    goto main_menu;}
     if (i==19) {void L1900();   L1900();    goto main_menu;}
     if (i==20) {void L2000();   L2000();    goto main_menu;}
+    if (i==30) {void L2100();   L2100();    goto main_menu;}
 
     goto main_menu;
 
@@ -7594,6 +7596,135 @@ alct_auto_done:
 
     pause("<cr>");
 
+    return;
+}
+//------------------------------------------------------------------------------
+//  Set ALCT ASIC delays
+//------------------------------------------------------------------------------
+    void 2100() {
+//L2100:
+    inquire("\tDelay[0-15] <cr>=%2i ", 0,15, 10, idelay);
+
+// Get initial boot register
+    status = vme_read(boot_adr,rd_data);    // Get current boot reg
+    boot_data_initial = rd_data;
+    printf("\tBoot=%4.4X Adr=%6.6X\n",rd_data,boot_adr);
+
+    for (i=0; i<=15; ++i) {boot_decode[i]=(rd_data >> i) & 0x1;}
+
+// Set jtag chain to ALCT user, chain source is boot register
+    ichain    = 0x2;    // ALCT user jtag
+    step_mode = 0;
+
+// Set ASIC bank 0-3: 24 ASICs are grouped into up to 7 banks of 6 chips
+
+    // ALCT672=7
+    // ALCT384=4
+    // ALCT288=3
+
+    int nbanks = mxadbs()/60;
+
+    for (ibank=0;ibank<nbanks;++ibank)
+    {
+        ibank_bit[0] = (ibank >> 0) & 0x1;
+        ibank_bit[1] = (ibank >> 1) & 0x1;
+
+        nrs_dly    = 1; //~Reset
+        seltst_dly = 0; // Self test mode
+
+        ccb_brcst_bit[0] = ibank_bit[0];    ccb_brcst_bit[4] = ibank_bit[0];    // 1st in time=2nd in time, alct not running 80MHz
+        ccb_brcst_bit[1] = ibank_bit[1];    ccb_brcst_bit[5] = ibank_bit[1];
+        ccb_brcst_bit[2] = nrs_dly;         ccb_brcst_bit[6] = nrs_dly;
+        ccb_brcst_bit[3] = seltst_dly;      ccb_brcst_bit[7] = seltst_dly;
+
+        ccb_brcst=0;
+        for (i=0; i<8; ++i) ccb_brcst=ccb_brcst | (ccb_brcst_bit[i]<<i);
+
+        ccb_cmd_wr = 0;
+        ccb_cmd_wr = ccb_cmd_wr |  (0x1 << 0);          // Set ccb_cfg_wr[0]=1 to enable VME control of ccb_brcst
+        ccb_cmd_wr = ccb_cmd_wr & ~(0x1 << 1);          // 1=chip deselected during shift in
+        ccb_cmd_wr = ccb_cmd_wr & ~(0x1 << 2);
+        ccb_cmd_wr = ccb_cmd_wr & ~(0x1 << 3);
+        ccb_cmd_wr = ccb_cmd_wr |  (ccb_brcst << 8);    // Set new ccb_brcst[7:0]
+
+        adr     = ccb_cmd_adr+base_adr;
+        wr_data = ccb_cmd_wr;
+        status  = vme_write(adr,wr_data);
+
+        // Set individual chip delays
+        idelay_bit[0]=(idelay>>0) & 0x1;
+        idelay_bit[1]=(idelay>>1) & 0x1;
+        idelay_bit[2]=(idelay>>2) & 0x1;
+        idelay_bit[3]=(idelay>>3) & 0x1;
+
+        for (ichip=0;ichip<6;++ichip) {
+            for (ibit =0;ibit <4;++ibit ) {
+                T[ichip][ibit]=idelay_bit[ibit];
+            }
+        }
+
+        for (ichip=0;ichip<6;++ichip)  {
+            for (ichan=0;ichan<16;++ichan) {
+                C[ichip][ichan]=0x0;
+            }
+        }
+
+        // Shift in 20 bits per chip x 6 chips: 1st T4,T3,T2,T1, C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,C14,C15,C16 last_in
+        nframes = 120;
+        for (i=0; i<nframes; ++i) tms[i]=0; // TMS= not used
+        for (i=0; i<nframes; ++i) tdi[i]=0; // TDI= data bits T[4:1] and C[16:1]
+
+        for (ichip=0;ichip<6;++ichip)
+        {
+            tdi[ichip*20+ 0]=T[ichip][3];
+            tdi[ichip*20+ 1]=T[ichip][2];
+            tdi[ichip*20+ 2]=T[ichip][1];
+            tdi[ichip*20+ 3]=T[ichip][0];
+
+            tdi[ichip*20+ 4]=C[ichip][0];
+            tdi[ichip*20+ 5]=C[ichip][1];
+            tdi[ichip*20+ 6]=C[ichip][2];
+            tdi[ichip*20+ 7]=C[ichip][3];
+
+            tdi[ichip*20+ 8]=C[ichip][4];
+            tdi[ichip*20+ 9]=C[ichip][5];
+            tdi[ichip*20+10]=C[ichip][6];
+            tdi[ichip*20+11]=C[ichip][7];
+
+            tdi[ichip*20+12]=C[ichip][8];
+            tdi[ichip*20+13]=C[ichip][9];
+            tdi[ichip*20+14]=C[ichip][10];
+            tdi[ichip*20+15]=C[ichip][11];
+
+            tdi[ichip*20+16]=C[ichip][12];
+            tdi[ichip*20+17]=C[ichip][13];
+            tdi[ichip*20+18]=C[ichip][14];
+            tdi[ichip*20+19]=C[ichip][15];
+        };
+
+        printf("\ttdi=");for(i=0;i<nframes;++i)printf("%1i",tdi[i]);printf("\n");
+
+        // Send shift data to JTAG
+        vme_jtag_io_byte(boot_adr,ichain,nframes,tms,tdi,tdo,step_mode);    // Shift in data
+        status = vme_read(boot_adr,rd_data); tdo_bit0=(rd_data>>15)&0x1;    // Get TDO before 1st TCK
+        vme_jtag_io_byte(boot_adr,ichain,nframes,tms,tdi,tdo,step_mode);    // Shift it in again to push out previous data
+
+        printf("\ttdo=%1i",tdo_bit0);
+        for (i=0;i<nframes-1;++i)
+            printf("%1i",tdo[i]);
+        printf("\n");
+
+        // Deassert chip select: shift register data transfers to FFs on rising edge of cs
+        ccb_cmd_wr = ccb_cmd_wr | (0x1 << 1);   // 0=chip loads after shift in
+        ccb_cmd_wr = ccb_cmd_wr | (0x1 << 2);
+        ccb_cmd_wr = ccb_cmd_wr | (0x1 << 3);
+
+        adr     = ccb_cmd_adr+base_adr;
+        wr_data = ccb_cmd_wr;
+        status  = vme_write(adr,wr_data);
+
+    }   // close for ibank
+    // Done
     return;
 }
 //------------------------------------------------------------------------------

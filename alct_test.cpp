@@ -2207,6 +2207,7 @@ main_menu:
     printf("\t17:  Slow Control Toggle JTAG bit\n");
     printf("\t18:  Slow Control Normal Firmware Submenu\n");
     printf("\t19:  Automatic Spartan-6 Mezzanine Tests\n");
+    printf("\t20:  Peek/Poke ALCT SC-Test JTAG Register\n");
     printf("\t<cr> Exit\n");
     printf("       > ");
 
@@ -2232,6 +2233,7 @@ main_menu:
     if (i==17) {void L1700();   L1700();    goto main_menu;}
     if (i==18) {void L1800();   L1800();    goto main_menu;}
     if (i==19) {void L1900();   L1900();    goto main_menu;}
+    if (i==20) {void L2000();   L2000();    goto main_menu;}
 
     goto main_menu;
 
@@ -7502,6 +7504,96 @@ alct_auto_done:
 
     if (test_file!=NULL) fclose(test_file);
     pause ("Return to main menu [cr}");
+    return;
+}
+//------------------------------------------------------------------------------
+//  Peek/Poke ALCT JTAG Registers
+//------------------------------------------------------------------------------
+    void L2000()
+{
+//  Chain ID    Section      Control or Program
+//  --------    ------------ ------------------
+//    0         Slow Control control registers
+//    1         Slow Control PROM
+//    2         Mezzanine    control registers
+//    3         Mezzanine    FPGA+PROM
+//
+//
+//  Mezzanie Virtex Control Registers (5-bit opcode)
+//
+    int alct_reg_len[0x19]={0};
+
+//  Name                OpCode  Length                              Dir     Function
+//  ------------        ---     -----------------------------       -----   ------------------
+    int sc_bypass         = 0x0;    alct_reg_len[sc_bypass     ]    =   1;    //  read    
+    int sc_fpga_type      = 0x1;    alct_reg_len[sc_fpga_type  ]    =   16;   //  read   
+    int sc_monthday       = 0x2;    alct_reg_len[sc_monthday   ]    =   16;   //  read  
+    int sc_year           = 0x3;    alct_reg_len[sc_year       ]    =   16;   //  read    0x5555
+    int sc_todd           = 0x4;    alct_reg_len[sc_todd       ]    =   16;   //  read    0xAAAA
+    int sc_teven          = 0x5;    alct_reg_len[sc_teven      ]    =   16;   //  read    
+    int sc_dsn_rd         = 0x6;    alct_reg_len[sc_dsn_rd     ]    =   10;   //  read    
+    int sc_dsn_wr         = 0x7;    alct_reg_len[sc_dsn_wr     ]    =   10;   //  write   
+    int sc_adc_rd         = 0x8;    alct_reg_len[sc_adc_rd     ]    =   5;    //  read    
+    int sc_adc_wr         = 0x9;    alct_reg_len[sc_adc_wr     ]    =   5;    //  write   
+    int sc_adb_hit_rd     = 0xa;    alct_reg_len[sc_adb_hit_rd ]    =   42;   //  write   
+    int sc_crc_err_rd     = 0xb;    alct_reg_len[sc_crc_err_rd ]    =   1;    //  
+    int sc_adb_adr_rd     = 0x15;   alct_reg_len[sc_adb_adr_rd ]    =   9;    //  read    ADB connector channel readback
+    int sc_adb_adr_wr     = 0x16;   alct_reg_len[sc_adb_adr_wr ]    =   9;    //  write   ADB connector channel 0-41
+    int sc_adb_scsi_rd    = 0x17;   alct_reg_len[sc_adb_scsi_rd]    =   16;   //  read    SCSI data readback
+    int sc_adb_scsi_wr    = 0x18;   alct_reg_len[sc_adb_scsi_wr]    =   16;   //  write   SCSI data to write
+    int sc_adb_data_rd    = 0x19;   alct_reg_len[sc_adb_data_rd]    =   16;   //  read    ADB data read back via delay ASIC and multiplexers
+
+//L900:
+    printf("\tsc_bypass         = 0x0;   //  1;  \n") ;
+    printf("\tsc_fpga_type      = 0x1;   //  16; \n") ;
+    printf("\tsc_monthday       = 0x2;   //  16; \n") ;
+    printf("\tsc_year           = 0x3;   //  16; \n") ;
+    printf("\tsc_todd           = 0x4;   //  16; \n") ;
+    printf("\tsc_teven          = 0x5;   //  16; \n") ;
+    printf("\tsc_dsn_rd         = 0x6;   //  10; \n") ;
+    printf("\tsc_dsn_wr         = 0x7;   //  10; \n") ;
+    printf("\tsc_adc_rd         = 0x8;   //  5;  \n") ;
+    printf("\tsc_adc_wr         = 0x9;   //  5;  \n") ;
+    printf("\tsc_adb_hit_rd     = 0xa;   //  42; \n") ;
+    printf("\tsc_crc_err_rd     = 0xb;   //  1;  \n") ;
+    printf("\tsc_adb_adr_rd     = 0x15;  //  9;  \n") ;
+    printf("\tsc_adb_adr_wr     = 0x16;  //  9;  \n") ;
+    printf("\tsc_adb_scsi_rd    = 0x17;  //  16; \n") ;
+    printf("\tsc_adb_scsi_wr    = 0x18;  //  16; \n") ;
+    printf("\tsc_adb_data_rd    = 0x19;  //  16; \n") ;
+    printf("\t<cr>=exit\n");
+
+    inquire("\tALCT mez JTAG register opcode  %2X", 0, 0x19, 16, opcode);
+
+// Switch to ALCT mez JTAG chain
+    adr     = boot_adr;                                     // Boot register address
+    ichain  = 0x02;                                         // ALCT Mezzanine user jtag chain
+    chip_id = 0;                                            // ALCT Mezzanine user jtag path has 1 chip
+
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+// Read data at selected opcode
+    reg_len = alct_reg_len[opcode];                         // Register length
+
+    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+    printf("\tOpcode=%2X Length=%3i rd=",opcode,alct_reg_len[opcode]);
+    if (reg_len>0) {for (i=reg_len-1;i>=0;--i) printf("%1i",tdo[i]); printf("\n");}
+    else printf("x\n");
+
+// Inquire write new data
+    inquirb("\tWrite new data [y|n]? cr=%3c", bans=false);
+    if (!bans) return;
+
+    // incomplete...get new data from console, serialize to tdi
+
+// Write data to selected opcode
+    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+    pause("<cr>");
+
     return;
 }
 //------------------------------------------------------------------------------

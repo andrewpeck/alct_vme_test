@@ -496,6 +496,7 @@
     void            vme_jtag_anystate_to_rti(unsigned long &adr, int &ichain);
     void            vme_jtag_write_ir       (unsigned long &adr, int &ichain, int &chip_id, int &opcode);
     void            vme_jtag_write_dr       (unsigned long &adr, int &ichain, int &chip_id, char wr_data[], char rd_data[], int &nbits);
+	void            vme_jtag_io_byte        (unsigned long &adr, int &ichain, int &nframes, char tms[], char tdi[], char tdo[], const int &step_mode); 
     bool            vme_jtag_cable_detect   (unsigned long &base_adr);
 
     int             get_alct_fpga_type        (); 
@@ -1356,6 +1357,9 @@
     long int        usercode;
     int             user_idcode[2];
     int             ichain;
+    int             idelay=15;
+    int             idelay_bit[4]; 
+    int             ibank_bit[3]; 
     int             idcode_v;
     int             idcode_f;
     int             idcode_a;
@@ -2235,7 +2239,7 @@ main_menu:
     if (i==18) {void L1800();   L1800();    goto main_menu;}
     if (i==19) {void L1900();   L1900();    goto main_menu;}
     if (i==20) {void L2000();   L2000();    goto main_menu;}
-    if (i==30) {void L2100();   L2100();    goto main_menu;}
+    if (i==21) {void L2100();   L2100();    goto main_menu;}
 
     goto main_menu;
 
@@ -7523,10 +7527,10 @@ alct_auto_done:
 //
 //  Mezzanie Virtex Control Registers (5-bit opcode)
 //
-    int alct_reg_len[0x19]={0};
+    int alct_reg_len[0x1D]={0};
 
-//  Name                OpCode  Length                              Dir     Function
-//  ------------        ---     -----------------------------       -----   ------------------
+//  Name                  OpCode    Length                                        Dir     Function
+//  ------------          ---       ---------------------------------------       -----   ------------------
     int sc_bypass         = 0x0;    alct_reg_len[sc_bypass     ]    =   1;    //  read    
     int sc_fpga_type      = 0x1;    alct_reg_len[sc_fpga_type  ]    =   16;   //  read   
     int sc_monthday       = 0x2;    alct_reg_len[sc_monthday   ]    =   16;   //  read  
@@ -7544,6 +7548,10 @@ alct_auto_done:
     int sc_adb_scsi_rd    = 0x17;   alct_reg_len[sc_adb_scsi_rd]    =   16;   //  read    SCSI data readback
     int sc_adb_scsi_wr    = 0x18;   alct_reg_len[sc_adb_scsi_wr]    =   16;   //  write   SCSI data to write
     int sc_adb_data_rd    = 0x19;   alct_reg_len[sc_adb_data_rd]    =   16;   //  read    ADB data read back via delay ASIC and multiplexers
+    int sc_dly_rd         = 0x1A;   alct_reg_len[sc_dly_rd     ]    =  120;   //  
+    int sc_dly_wr         = 0x1B;   alct_reg_len[sc_dly_wr     ]    =  120;   //  
+    int sc_dly_sel_rd     = 0x1C;   alct_reg_len[sc_dly_sel_rd ]    =   3;    //  
+    int sc_dly_sel_wr     = 0x1D;   alct_reg_len[sc_dly_sel_wr ]    =   3;    //  
 
 //L900:
     printf("\tsc_bypass         = 0x0;   //  1;  \n") ;
@@ -7563,9 +7571,13 @@ alct_auto_done:
     printf("\tsc_adb_scsi_rd    = 0x17;  //  16; \n") ;
     printf("\tsc_adb_scsi_wr    = 0x18;  //  16; \n") ;
     printf("\tsc_adb_data_rd    = 0x19;  //  16; \n") ;
-    printf("\t<cr>=exit\n");
+    printf("\tsc_dly_rd         = 0x1A;  // 120; \n") ;
+    printf("\tsc_dly_wr         = 0x1B;  // 120; \n") ;
+    printf("\tsc_dly_sel_rd     = 0x1C;  //  3;  \n") ;
+    printf("\tsc_dly_sel_wr     = 0x1D;  //  3;  \n") ;
+    printf("\t<cr>=exit \n");
 
-    inquire("\tALCT mez JTAG register opcode  %2X", 0, 0x19, 16, opcode);
+    inquire("\tALCT mez JTAG register opcode <cr>=%2X ", 0, 0x1d, 16, opcode);
 
 // Switch to ALCT mez JTAG chain
     adr     = boot_adr;                                     // Boot register address
@@ -7601,20 +7613,21 @@ alct_auto_done:
 //------------------------------------------------------------------------------
 //  Set ALCT ASIC delays
 //------------------------------------------------------------------------------
-    void 2100() {
+void L2100() {
 //L2100:
-    inquire("\tDelay[0-15] <cr>=%2i ", 0,15, 10, idelay);
+    int idelay=15;
+    // inquire("\tDelay[0-15] <cr>=%2i ", 0,15, 10, idelay);
 
 // Get initial boot register
     status = vme_read(boot_adr,rd_data);    // Get current boot reg
-    boot_data_initial = rd_data;
+    int boot_data_initial = rd_data;
     printf("\tBoot=%4.4X Adr=%6.6X\n",rd_data,boot_adr);
 
     for (i=0; i<=15; ++i) {boot_decode[i]=(rd_data >> i) & 0x1;}
 
 // Set jtag chain to ALCT user, chain source is boot register
     ichain    = 0x2;    // ALCT user jtag
-    step_mode = 0;
+    int step_mode = 0;
 
 // Set ASIC bank 0-3: 24 ASICs are grouped into up to 7 banks of 6 chips
 
@@ -7622,40 +7635,65 @@ alct_auto_done:
     // ALCT384=4
     // ALCT288=3
 
-    int nbanks = mxadbs()/60;
+    int nbanks = mxadbs()/6;
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
 
-    for (ibank=0;ibank<nbanks;++ibank)
-    {
-        ibank_bit[0] = (ibank >> 0) & 0x1;
-        ibank_bit[1] = (ibank >> 1) & 0x1;
+    int err_cnt=0; 
 
-        nrs_dly    = 1; //~Reset
-        seltst_dly = 0; // Self test mode
+    const int idlytst_max = 6; 
+    int idly_pattern [idlytst_max] = {0xffff,0x0000,0x5555,0xAAAA,0x6666,0x9999}; 
 
-        ccb_brcst_bit[0] = ibank_bit[0];    ccb_brcst_bit[4] = ibank_bit[0];    // 1st in time=2nd in time, alct not running 80MHz
-        ccb_brcst_bit[1] = ibank_bit[1];    ccb_brcst_bit[5] = ibank_bit[1];
-        ccb_brcst_bit[2] = nrs_dly;         ccb_brcst_bit[6] = nrs_dly;
-        ccb_brcst_bit[3] = seltst_dly;      ccb_brcst_bit[7] = seltst_dly;
+    int pat; 
 
-        ccb_brcst=0;
-        for (i=0; i<8; ++i) ccb_brcst=ccb_brcst | (ccb_brcst_bit[i]<<i);
+    for (int idlytst=0; idlytst<idlytst_max; idlytst++) {
 
-        ccb_cmd_wr = 0;
-        ccb_cmd_wr = ccb_cmd_wr |  (0x1 << 0);          // Set ccb_cfg_wr[0]=1 to enable VME control of ccb_brcst
-        ccb_cmd_wr = ccb_cmd_wr & ~(0x1 << 1);          // 1=chip deselected during shift in
-        ccb_cmd_wr = ccb_cmd_wr & ~(0x1 << 2);
-        ccb_cmd_wr = ccb_cmd_wr & ~(0x1 << 3);
-        ccb_cmd_wr = ccb_cmd_wr |  (ccb_brcst << 8);    // Set new ccb_brcst[7:0]
+    idelay=0xf & idly_pattern[idlytst]; 
+    pat = idly_pattern[idlytst]; 
 
-        adr     = ccb_cmd_adr+base_adr;
-        wr_data = ccb_cmd_wr;
-        status  = vme_write(adr,wr_data);
+    for (ibank=0;ibank<nbanks;++ibank) {
+
+
+        printf("\tWriting ASIC delays for bank %i\n", ibank); 
+
+
+    // Switch to ALCT mez JTAG chain
+        adr     = boot_adr;                                     // Boot register address
+        ichain  = 0x02;                                         // ALCT Mezzanine user jtag chain
+        chip_id = 0;                                            // ALCT Mezzanine user jtag path has 1 chip
+
+        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        opcode = 0x1D; 
+        reg_len = 3; 
+
+        tdi[0] = (ibank >> 0) & 0x1;
+        tdi[1] = (ibank >> 1) & 0x1;
+        tdi[2] = (ibank >> 2) & 0x1;
+
+    // Write data to selected opcode
+        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+    // Read data at selected opcode
+
+        opcode = 0x1C; 
+
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+        printf("\tOpcode=%2X Length=%3i rd=",opcode,reg_len); 
+        if (reg_len>0) {for (i=reg_len-1;i>=0;--i) printf("%1i",tdo[i]); printf("\n");}
+        else printf("x\n");
 
         // Set individual chip delays
         idelay_bit[0]=(idelay>>0) & 0x1;
         idelay_bit[1]=(idelay>>1) & 0x1;
         idelay_bit[2]=(idelay>>2) & 0x1;
         idelay_bit[3]=(idelay>>3) & 0x1;
+
+        int             T[6][4];
+        int             C[6][16];
 
         for (ichip=0;ichip<6;++ichip) {
             for (ibit =0;ibit <4;++ibit ) {
@@ -7664,14 +7702,13 @@ alct_auto_done:
         }
 
         for (ichip=0;ichip<6;++ichip)  {
-            for (ichan=0;ichan<16;++ichan) {
-                C[ichip][ichan]=0x0;
+            for (int ichan=0;ichan<16;++ichan) {
+                C[ichip][ichan]=(pat>>ichan) & 0x1;
             }
         }
 
         // Shift in 20 bits per chip x 6 chips: 1st T4,T3,T2,T1, C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,C14,C15,C16 last_in
         nframes = 120;
-        for (i=0; i<nframes; ++i) tms[i]=0; // TMS= not used
         for (i=0; i<nframes; ++i) tdi[i]=0; // TDI= data bits T[4:1] and C[16:1]
 
         for (ichip=0;ichip<6;++ichip)
@@ -7702,29 +7739,69 @@ alct_auto_done:
             tdi[ichip*20+19]=C[ichip][15];
         };
 
-        printf("\ttdi=");for(i=0;i<nframes;++i)printf("%1i",tdi[i]);printf("\n");
+        opcode = 0x1B; 
 
-        // Send shift data to JTAG
-        vme_jtag_io_byte(boot_adr,ichain,nframes,tms,tdi,tdo,step_mode);    // Shift in data
-        status = vme_read(boot_adr,rd_data); tdo_bit0=(rd_data>>15)&0x1;    // Get TDO before 1st TCK
-        vme_jtag_io_byte(boot_adr,ichain,nframes,tms,tdi,tdo,step_mode);    // Shift it in again to push out previous data
+        reg_len = nframes; 
 
-        printf("\ttdo=%1i",tdo_bit0);
-        for (i=0;i<nframes-1;++i)
+        // Write data to selected opcode
+
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        int tdo_first = tdo[nframes-1]; 
+
+        // Read data at selected opcode
+
+        opcode = 0x1A; 
+
+        // int bit_burn=1; 
+
+        // vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        // vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,bit_burn); // Write tdi, read tdo
+
+        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        reg_len ++; 
+
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+        printf("\ttdi = ");
+        for(i=0;i<nframes;++i)
+            printf("%1i",tdi[i]);
+        printf("\n");
+
+
+        printf("\ttdo = ");
+        //printf("%1i",tdo_first);
+        for (i=1;i<nframes+1;++i)
             printf("%1i",tdo[i]);
         printf("\n");
 
-        // Deassert chip select: shift register data transfers to FFs on rising edge of cs
-        ccb_cmd_wr = ccb_cmd_wr | (0x1 << 1);   // 0=chip loads after shift in
-        ccb_cmd_wr = ccb_cmd_wr | (0x1 << 2);
-        ccb_cmd_wr = ccb_cmd_wr | (0x1 << 3);
+        int err=0; 
+        printf("\terr = ");
+        for (i=0;i<nframes;++i) {
+            char err_c = (tdi[i]^tdo[i+1])==1 ? 'X' : '_'; 
+            if ((tdi[i]^tdo[i+1])==1) err=1;
+            printf("%c", err_c);
+        }
+        printf("\n");
 
-        adr     = ccb_cmd_adr+base_adr;
-        wr_data = ccb_cmd_wr;
-        status  = vme_write(adr,wr_data);
+        if (err) err_cnt++; 
 
     }   // close for ibank
+    } // close idlytst
+
+    printf("\n");
+    if   (err_cnt==0) 
+        printf("\tDelay ASICs Test PASSED\n"); 
+    else 
+        printf("\tDelay ASICs Test FAILED\n"); 
+
     // Done
+    printf("\t Done writing delay ASICs\n"); 
     return;
 }
 //------------------------------------------------------------------------------

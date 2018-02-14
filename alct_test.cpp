@@ -626,7 +626,7 @@
     bool            adb_auto;
     bool            adb_passed[24];
 
-    const int       alct_ntests=90;
+    const int       alct_ntests=90; // FIXME: need to update this with actual number
     int             alct_npassed[alct_ntests+1];
     int             alct_nfailed[alct_ntests+1];
     int             alct_nskipped[alct_ntests+1];
@@ -726,8 +726,8 @@
                     "ADC0 Ch8 Vthr15",
                     "ADC0 Ch9 Vthr14",
                     "ADC0 ChA Vthr13",
-                    "ADC0 ChB Vzero ",
                     "ADC0 ChC Vhalf ",
+                    "ADC0 ChB Vzero ",
                     "ADC0 ChD Vfull ",
 
                     "ADC1 Ch0 Vthr12",
@@ -741,8 +741,8 @@
                     "ADC1 Ch8 Vthr4 ",
                     "ADC1 Ch9 Vthr3 ",
                     "ADC1 ChA Vthr2 ",
-                    "ADC1 ChB Vzero ",
                     "ADC1 ChC Vhalf ",
+                    "ADC1 ChB Vzero ",
                     "ADC1 ChD Vfull ",
 
                     "ADC2 Ch0 Vthr1 ",
@@ -771,8 +771,8 @@
                     "ADC3 Ch8 Vthr  ",
                     "ADC3 Ch9 Vthr  ",
                     "ADC3 ChA Vthr  ",
-                    "ADC3 ChB Vzero ",
                     "ADC3 ChC Vhalf ",
+                    "ADC3 ChB Vzero ",
                     "ADC3 ChD Vfull ",
 
                     "ADC4 Ch0 Vthr  ",
@@ -786,8 +786,8 @@
                     "ADC4 Ch8 Vthr  ",
                     "ADC4 Ch9 Vthr  ",
                     "ADC4 ChA Vthr  ",
-                    "ADC4 ChB Vzero ",
                     "ADC4 ChC Vhalf ",
+                    "ADC4 ChB Vzero ",
                     "ADC4 ChD Vfull "
                     };
 
@@ -804,8 +804,8 @@
                     "V",    // ADC0 Ch8 Vthr15
                     "V",    // ADC0 Ch9 Vthr14
                     "V",    // ADC0 ChA Vthr13
-                    "V",    // ADC0 ChB Vzero
-                    "V",    // ADC0 ChC Vhalf
+                    "V",    // ADC0 ChB Vhalf
+                    "V",    // ADC0 ChC Vzero
                     "V",    // ADC0 ChD Vfull
 
                     "V",    // ADC1 Ch0 Vthr12
@@ -819,8 +819,8 @@
                     "V",    // ADC1 Ch8 Vthr4
                     "V",    // ADC1 Ch9 Vthr3
                     "V",    // ADC1 ChA Vthr2
-                    "V",    // ADC1 ChB Vzero
-                    "V",    // ADC1 ChC Vhalf
+                    "V",    // ADC1 ChB Vhalf
+                    "V",    // ADC1 ChC Vzero
                     "V",    // ADC1 ChD Vfull
 
                     "V",    // ADC2 Ch0 Vthr1
@@ -834,8 +834,8 @@
                     "V",    // ADC2 Ch8 +5.5V1
                     "V",    // ADC2 Ch9 +5.5V2
                     "C",    // ADC2 ChA Temp
-                    "V",    // ADC2 ChB Vzero
-                    "V",    // ADC2 ChC Vhalf
+                    "V",    // ADC2 ChB Vhalf
+                    "V",    // ADC2 ChC Vzero
                     "V",    // ADC2 ChD Vfull
 
                     "V",    // ADC3 Ch0 Vthr
@@ -849,8 +849,8 @@
                     "V",    // ADC3 Ch8 Vthr
                     "V",    // ADC3 Ch9 Vthr
                     "V",    // ADC3 ChA Vthr
-                    "V",    // ADC3 ChB Vzero
-                    "V",    // ADC3 ChC Vhalf
+                    "V",    // ADC3 ChB Vhalf
+                    "V",    // ADC3 ChC Vzero
                     "V",    // ADC3 ChD Vfull
 
                     "V",    // ADC4 Ch0 Vthr
@@ -864,8 +864,8 @@
                     "V",    // ADC4 Ch8 Vthr
                     "V",    // ADC4 Ch9 Vthr
                     "V",    // ADC4 ChA Temp
-                    "V",    // ADC4 ChB Vzero
-                    "V",    // ADC4 ChC Vhalf
+                    "V",    // ADC4 ChB Vhalf
+                    "V",    // ADC4 ChC Vzero
                     "V"     // ADC4 ChD Vfull
                     };
 
@@ -882,8 +882,8 @@
                     1.0,    // ADC0 Ch8 Vthr15
                     1.0,    // ADC0 Ch9 Vthr14
                     1.0,    // ADC0 ChA Vthr13
-                    1.0,    // ADC0 ChB Vzero
-                    1.0,    // ADC0 ChC Vhalf
+                    1.0,    // ADC0 ChB Vhalf
+                    1.0,    // ADC0 ChC Vzero
                     1.0,    // ADC0 ChD Vfull
 
                     1.0,    // ADC1 Ch0 Vthr12
@@ -897,8 +897,8 @@
                     1.0,    // ADC1 Ch8 Vthr4
                     1.0,    // ADC1 Ch9 Vthr3
                     1.0,    // ADC1 ChA Vthr2
-                    1.0,    // ADC1 ChB Vzero
-                    1.0,    // ADC1 ChC Vhalf
+                    1.0,    // ADC1 ChB Vhalf
+                    1.0,    // ADC1 ChC Vzero
                     1.0,    // ADC1 ChD Vfull
 
                     1.0,    // ADC2 Ch0 Vthr1
@@ -912,8 +912,8 @@
                     4.9,    // ADC2 Ch8 +5.5V1
                     4.9,    // ADC2 Ch9 +5.5V2
                     100.,   // ADC2 ChA Temp
-                    1.0,    // ADC2 ChB Vzero
-                    1.0,    // ADC2 ChC Vhalf
+                    1.0,    // ADC2 ChB Vhalf
+                    1.0,    // ADC2 ChC Vzero
                     1.0,    // ADC2 ChD Vfull
 
                     1.0,    // ADC3 Ch0 Vthr
@@ -927,8 +927,8 @@
                     1.0,    // ADC3 Ch8 Vthr
                     1.0,    // ADC3 Ch9 Vthr
                     1.0,    // ADC3 ChA Vthr
-                    1.0,    // ADC3 ChB Vzero
-                    1.0,    // ADC3 ChC Vhalf
+                    1.0,    // ADC3 ChB Vhalf
+                    1.0,    // ADC3 ChC Vzero
                     1.0,    // ADC3 ChD Vfull
 
                     1.0,    // ADC4 Ch0 Vthr
@@ -942,8 +942,8 @@
                     1.0,    // ADC4 Ch8 Vthr
                     1.0,    // ADC4 Ch9 Vthr
                     1.0,    // ADC4 ChA Vthr
-                    1.0,    // ADC4 ChB Vzero
-                    1.0,    // ADC4 ChC Vhalf
+                    1.0,    // ADC4 ChB Vhalf
+                    1.0,    // ADC4 ChC Vzero
                     1.0     // ADC4 ChD Vfull
                     };
 
@@ -2239,7 +2239,7 @@ main_menu:
     if (i==18) {void L1800();   L1800();    goto main_menu;}
     if (i==19) {void L1900();   L1900();    goto main_menu;}
     if (i==20) {void L2000();   L2000();    goto main_menu;}
-    if (i==21) {void L2100();   L2100();    goto main_menu;}
+    if (i==21) {int  L2100();   L2100();    goto main_menu;}
 
     goto main_menu;
 
@@ -5266,8 +5266,12 @@ start_sctest:
     else
         {alct_nfailed[itest]=1; ipf=1;}
 
-    fprintf(stdout, "\t%2i ALCT FPGA type %4.4X %s %s %s\n",itest,alct_fpga,salct_fpga.c_str(),spaces[18].c_str(),spass_fail[ipf].c_str());
-    fprintf(test_file,"%2i ALCT FPGA type %4.4X %s %s %s\n",itest,alct_fpga,salct_fpga.c_str(),spaces[18].c_str(),spass_fail[ipf].c_str());
+    int nspaces=12; 
+    if (salct_fpga=="Spartan-6 LX150T") 
+        nspaces--; 
+
+    fprintf(stdout, "\t%2i ALCT FPGA type %4.4X %s %s %s\n",itest,alct_fpga,salct_fpga.c_str(),spaces[nspaces].c_str(),spass_fail[ipf].c_str());
+    fprintf(test_file,"%2i ALCT FPGA type %4.4X %s %s %s\n",itest,alct_fpga,salct_fpga.c_str(),spaces[nspaces].c_str(),spass_fail[ipf].c_str());
 
 // Test 2: Read ALCT firmware date
     itest=2;
@@ -5289,7 +5293,10 @@ start_sctest:
     alct_fday   = (alct_fmonthday >> 0) & 0xFF;
     alct_fmonth = (alct_fmonthday >> 8) & 0xFF;
 
-    if ((alct_fmonth==0x05) && (alct_fday==0x09) && (alct_fyear==0x2012))
+    if (
+            ((alct_fmonth==0x05) && (alct_fday==0x09) && (alct_fyear==0x2012)) || 
+            ((alct_fmonth==0x01) && (alct_fday==0x23) && (alct_fyear==0x2017))
+    )
             {alct_npassed[itest]=1; ipf=0;}
     else    {alct_nfailed[itest]=1; ipf=1;}
 
@@ -5383,11 +5390,14 @@ start_sctest:
     tsink_mez_f = (32.+tsink_mez*9./5.);
     tgbtx_mez_f = (32.+tgbtx_mez*9./5.);
 
+    adc_errs.clear();
+
     voltages.clear();
     temperatures.clear();
-    adc_errs.clear();
+
     voltages_errs.clear();
     temperatures_errs.clear();
+
     voltages_text.clear();
     temperatures_text.clear();
 
@@ -5401,47 +5411,48 @@ start_sctest:
 
     if (alct_fpga_type==0x1506) // S-6 150
     {
-    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); temperatures_errs.push_back(err_last); temperatures.push_back(tsink_mez_f); temperatures_text.push_back("+Temp  TSink  ");
+    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); temperatures_errs.push_back(err_last); temperatures.push_back(tsink_mez_f)        ; temperatures_text.push_back("+Temp   TSink  ");
     }
     else if (alct_fpga_type==0x1006)
     {
-    tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5_mez)      ; voltages_text.push_back("+1.2   Vccint ")     ;
-    tok("RSSI      S6 Mez ", vgbtx_rssi, 1.00,  0.1,     err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vgbtx_rssi)    ; voltages_text.push_back("+1.2   Vccint ")     ;
-    tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez) ; temperatures_text.push_back("+Tenp  TGBTX  ");
+    tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5_mez)            ;     voltages_text.push_back("+1.2    Vccint ")     ;
+    tok("RSSI      S6 Mez ", vgbtx_rssi, 1.00,  0.1,     err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vgbtx_rssi)          ;     voltages_text.push_back("+1.2    Vccint ")     ;
+    tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez)       ; temperatures_text.push_back("+Tenp   TGBTX  ");
     }
     else if (alct_fpga_type==0x1516)
     {
-    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vcore_mez  )     ; voltages_text.push_back("+1.2   Vccint ")     ;
-    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back("+Temp  TSink  ");
+    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vcore_mez  )     ;     voltages_text.push_back("+1.2    Vccint ")     ;
+    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back("+Temp   TSink   ");
     }
 
-    tok("Tfpga     S6 Mez " , tfpga_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; voltages.push_back(tfpga_mez_f) ; temperatures_text.push_back     ("+Temp  TFpga  ") ;
+    tok("Tfpga     S6 Mez ", tfpga_mez_f , 72.00 , .2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)    ; temperatures_text.push_back("+Temp   TFpga  ") ;
+    tok("+vref/2   S6 Mez ", vref2_mez   , 1.250,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref2_mez)    ;     voltages_text.push_back("+vref/2 1.25V ") ;
+    tok("+vzero    S6 Mez ", vzero_mez   , 0.0,    .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vzero_mez)    ;     voltages_text.push_back("+vzero  0.00V ") ;
+    tok("+vref     S6 Mez ", vref_mez    , 2.499,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref_mez )    ;     voltages_text.push_back("+vref   2.50V ") ;
 
-    tok("+vref/2 S6 Mez ", vref2_mez,   1.250,       .0010,     err_last) ; voltages_errs.push_back(err_last) ; voltages.push_back(vref2_mez) ; voltages_text.push_back("+vref/2 1.25V ") ;
-    tok("+vzero  S6 Mez ", vzero_mez,   0.0,         .0010,     err_last) ; voltages_errs.push_back(err_last) ; voltages.push_back(vzero_mez) ; voltages_text.push_back("+vzero  0.00V ") ;
-    tok("+vref   S6 Mez ", vref_mez,    2.499,       .0010,     err_last) ; voltages_errs.push_back(err_last) ; voltages.push_back(vref_mez ) ; voltages_text.push_back("+vref   2.50V ") ;
-
+    if (voltages.size()>0)
     for (i=0; i<int(voltages.size()); i++) {
-        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i], voltages[i], spass_fail[voltages_errs[i]].c_str());
-        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i], voltages[i], spass_fail[voltages_errs[i]].c_str());
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
         itest++;
     }
 
+    if (temperatures.size()>0)
     for (i=0; i<int(temperatures.size()); i++) {
-        fprintf(stdout,    "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i], temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
-        fprintf(test_file, "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i], temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i].c_str(), temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i].c_str(), temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
         itest++;
     }
 
     itest=7;
 
-    for (i=0; i<=int(voltages_errs.size()); ++i)
+    for (i=0; i<int(voltages_errs.size()); ++i)
     {
         if (voltages_errs[i]==0) alct_npassed[itest+i]=1;
         else                     alct_nfailed[itest+i]=1;
     }
 
-    for (i=0; i<=int(temperatures_errs.size()); ++i)
+    for (i=0; i<int(temperatures_errs.size()); ++i)
     {
         if (temperatures_errs[i]==0) alct_npassed[itest+i]=1;
         else                         alct_nfailed[itest+i]=1;
@@ -5534,7 +5545,8 @@ start_sctest:
 
     if (sc_version_new) {alct_npassed[itest]=1; ipf=0;} // require new because this program won't work with old, dunno why
 //  if (sc_version_old) {alct_npassed[itest]=1; ipf=0;}
-    else                {alct_nfailed[itest]=1; ipf=1;}
+    else                {alct_nfailed[itest]=1; ipf=1;
+        fprintf(stdout, "\tPlease make sure that you are using the new slow control firmware version (11/28/2012)\n"); }
 
     fprintf(stdout, "\t%2i Slow Control firmware  %2.2X/%2.2X/%4.4X  ver=%1X chip=%1X  %s\n",itest,sc_id_month,sc_id_day,sc_id_year,sc_id_version,sc_id_chip,spass_fail[ipf].c_str());
     fprintf(test_file,"%2i Slow Control firmware  %2.2X/%2.2X/%4.4X  ver=%1X chip=%1X  %s\n",itest,sc_id_month,sc_id_day,sc_id_year,sc_id_version,sc_id_chip,spass_fail[ipf].c_str());
@@ -5561,18 +5573,18 @@ start_sctest:
     iadc = 2;                                               // Power supply adc
     for (adc_adr=0; adc_adr<=15; ++adc_adr)                 // 11 channels + 3 internal channels (0-13) + 1 to read last ch
     {
-    adc_word = ((adc_adr%14) << 7);                         // adr 0 reads junk, adr 1-14 reads ch 0-13
-    opcode  = 0x10+iadc;                                    // Opcode
-    reg_len = 11;                                           // Register length
+        adc_word = ((adc_adr%14) << 7);                         // adr 0 reads junk, adr 1-14 reads ch 0-13
+        opcode  = 0x10+iadc;                                    // Opcode
+        reg_len = 11;                                           // Register length
 
-    i4_to_tdi(i4=adc_word, &tdi[0], reg_len, 1);            // SPI=1 for DACs | ADCs that take MSB first
+        i4_to_tdi(i4=adc_word, &tdi[0], reg_len, 1);            // SPI=1 for DACs | ADCs that take MSB first
 
-    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
-    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
 
-    tdi_to_i4(&tdo[0],i4,reg_len,1);                        // SPI=1 for DACs | ADCs that take MSB first
-    adc_ch = adc_adr-1;                                     // Data read at this adr is for previous channel
-    if (adc_adr > 0) adc_data[iadc][adc_ch] = i4;
+        tdi_to_i4(&tdo[0],i4,reg_len,1);                        // SPI=1 for DACs | ADCs that take MSB first
+        adc_ch = adc_adr-1;                                     // Data read at this adr is for previous channel
+        if (adc_adr > 0) adc_data[iadc][adc_ch] = i4;
     }
 
     vref_sc = 1.225;
@@ -5580,59 +5592,62 @@ start_sctest:
 
     for (adc_ch=0; adc_ch<=0xD; ++ adc_ch)
     {
-    if (iadc==2 && adc_ch==0xA) vadc_offset =  0.5;         // Subtract 500mV from temperature sensor, expect 750mV at 25C
-    else                        vadc_offset =  0.0;
+        if (iadc==2 && adc_ch==0xA) vadc_offset =  0.5;         // Subtract 500mV from temperature sensor, expect 750mV at 25C
+        else                                    vadc_offset =  0.0;
 
-    vadc        = double(adc_data[iadc][adc_ch])*vlsb_sc;
-    vadc_scaled = (vadc-vadc_offset) * adc_ch_scale[iadc][adc_ch];
-    vadc_base[iadc][adc_ch] = vadc_scaled;
+        vadc        = double(adc_data[iadc][adc_ch])*vlsb_sc;
+        vadc_scaled = (vadc-vadc_offset) * adc_ch_scale[iadc][adc_ch];
+        vadc_base[iadc][adc_ch] = vadc_scaled;
 
-    //  printf("\tADC channel %1X  %4i  %s  %5.3fV %6.3f%s\n",adc_ch, adc_data[iadc][adc_ch], adc_ch_name[iadc][adc_ch].c_str(), vadc, vadc_scaled, adc_ch_unit[iadc][adc_ch].c_str());
+        //  printf("\tADC channel %1X  %4i  %s  %5.3fV %6.3f%s\n",adc_ch, adc_data[iadc][adc_ch], adc_ch_name[iadc][adc_ch].c_str(), vadc, vadc_scaled, adc_ch_unit[iadc][adc_ch].c_str());
     }   // close adc_ch
+
+    double i3v3_expect = (1.5/24.0 * mxadbs()); 
+
     for (i=0; i<=13; ++i) adc_err_base[i]=0;
 
-    tok("ADC2 Ch2 +1.8A  ", vadc_base[iadc][ 2],    0.1077,      .4000,     adc_err_base[ 2]);
-    tok("ADC2 Ch3 +3.3A  ", vadc_base[iadc][ 3],    1.5,         .2500,     adc_err_base[ 3]);
-    if (alct_board_id==801) adc_err_base[3]=0;  // 3.3A circuit is broken on board 801, skip it for now
-//  tok("ADC2 Ch4 +5.5A1 ", vadc_base[iadc][ 4],    0.085,       .5000,     adc_err_base[ 4]);  // These are too small to read reliably
-//  tok("ADC2 Ch5 +5.5A2 ", vadc_base[iadc][ 5],    0.084,       .5000,     adc_err_base[ 5]);
-    tok("ADC2 Ch6 +1.8V  ", vadc_base[iadc][ 6],    1.800,       .1000,     adc_err_base[ 6]);
-    tok("ADC2 Ch7 +3.3V  ", vadc_base[iadc][ 7],    3.300,       .1000,     adc_err_base[ 7]);
-    tok("ADC2 Ch8 +5.65V1", vadc_base[iadc][ 8],    5.650,       .1000,     adc_err_base[ 8]);
-    tok("ADC2 Ch9 +5.65V2", vadc_base[iadc][ 9],    5.650,       .1000,     adc_err_base[ 9]);
-    tok("ADC2 ChA Temp   ", vadc_base[iadc][10],    22.850,      .2500,     adc_err_base[10]);
-    tok("ADC2 ChB Vhalf  ", vadc_base[iadc][11],    0.6125,      .0010,     adc_err_base[11]);
-    tok("ADC2 ChC Vzero  ", vadc_base[iadc][12],    0.000,       .0010,     adc_err_base[12]);
-    tok("ADC2 Ch13 Vfull ", vadc_base[iadc][13],    1.224,       .0010,     adc_err_base[13]);
+    tok("ADC Ch2 +1.8A  ", vadc_base[iadc][ 2],    0.1077,      .4000,     adc_err_base[ 2]);
+    tok("ADC Ch3 +3.3A  ", vadc_base[iadc][ 3],    i3v3_expect, .2500,     adc_err_base[ 3]);
+    if (alct_board_id==801)   adc_err_base[3]=0;  // 3.3A circuit is broken on board 801, skip it for now
+//  tok("ADC Ch4 +5.5A1 ", vadc_base[iadc][ 4],    0.085,       .5000,     adc_err_base[ 4]);  // These are too small to read reliably
+//  tok("ADC Ch5 +5.5A2 ", vadc_base[iadc][ 5],    0.084,       .5000,     adc_err_base[ 5]);
+    tok("ADC Ch6 +1.8V  ", vadc_base[iadc][ 6],    1.800,       .1000,     adc_err_base[ 6]);
+    tok("ADC Ch7 +3.3V  ", vadc_base[iadc][ 7],    3.300,       .1000,     adc_err_base[ 7]);
+    tok("ADC Ch8 +5.65V1", vadc_base[iadc][ 8],    5.650,       .1000,     adc_err_base[ 8]);
+    tok("ADC Ch9 +5.65V2", vadc_base[iadc][ 9],    5.650,       .1000,     adc_err_base[ 9]);
+    tok("ADC ChA Temp   ", vadc_base[iadc][10],    25.850,      .2500,     adc_err_base[10]);
+    tok("ADC ChB Vhalf  ", vadc_base[iadc][11],    0.6125,      .0010,     adc_err_base[11]);
+    tok("ADC ChC Vzero  ", vadc_base[iadc][12],    0.000,       .0010,     adc_err_base[12]);
+    tok("ADC Ch13 Vfull ", vadc_base[iadc][13],    1.224,       .0010,     adc_err_base[13]);
 
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch2  +1.8A   Acore %12.3f A      %s\n",itest,vadc_base[iadc][ 2],  spass_fail[adc_err_base[ 2]].c_str());  itest++;
-    if (alct_board_id==801) {fprintf(stdout, "\t%2i ALCT ADC2 Ch3  +3.3A   Abase %12.3f A      %s\n",itest,vadc_base[iadc][ 3], "SKIP");    itest++;}
-    else                    {fprintf(stdout, "\t%2i ALCT ADC2 Ch3  +3.3A   Abase %12.3f A      %s\n",itest,vadc_base[iadc][ 3], spass_fail[adc_err_base[ 3]].c_str());  itest++;}
-    fprintf(stdout, "\t%2i ALCt ADC2 Ch4  +5.65A1 Aadb  %12.3f A      %s\n",itest,vadc_base[iadc][ 4],  spass_fail[adc_err_base[ 4]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch5  +5.65A2 Aadb  %12.3f A      %s\n",itest,vadc_base[iadc][ 5],  spass_fail[adc_err_base[ 5]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch6  +1.8V   Vcore %12.3f V      %s\n",itest,vadc_base[iadc][ 6],  spass_fail[adc_err_base[ 6]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch7  +3.3V   Vcc   %12.3f V      %s\n",itest,vadc_base[iadc][ 7],  spass_fail[adc_err_base[ 7]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch8  +5.65V1 Vadb  %12.3f V      %s\n",itest,vadc_base[iadc][ 8],  spass_fail[adc_err_base[ 8]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch9  +5.65V2 Vadb  %12.3f V      %s\n",itest,vadc_base[iadc][ 9],  spass_fail[adc_err_base[ 9]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch10 +Tdegc  Vtemp %12.3f C      %s\n",itest,vadc_base[iadc][10],  spass_fail[adc_err_base[10]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch11 +0.612  Vref/2%12.3f V      %s\n",itest,vadc_base[iadc][11],  spass_fail[adc_err_base[11]].c_str());  itest++;
-    fprintf(stdout, "\t%2i ALCT ADC2 Ch12 +0.000  Vzero %12.3f V      %s\n",itest,vadc_base[iadc][12],  spass_fail[adc_err_base[12]].c_str());  itest++;
-    fprintf(stdout," \t%2i ALCT ADC2 Ch13 +1.224  Vref  %12.3f V      %s\n",itest,vadc_base[iadc][13],  spass_fail[adc_err_base[13]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch2  +1.8A   Acore %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 2],  spass_fail[adc_err_base[ 2]].c_str());  itest++;
+    if (alct_board_id==801) {fprintf(stdout, "\t%2i ALCT ADC%i Ch3  +3.3A   Abase %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 3], "SKIP");    itest++;}
+    else                    {fprintf(stdout, "\t%2i ALCT ADC%i Ch3  +3.3A   Abase %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 3], spass_fail[adc_err_base[ 3]].c_str());  itest++;}
+    fprintf(stdout, "\t%2i ALCt ADC%i Ch4  +5.65A1 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 4],  spass_fail[adc_err_base[ 4]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch5  +5.65A2 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 5],  spass_fail[adc_err_base[ 5]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch6  +1.8V   Vcore %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 6],  spass_fail[adc_err_base[ 6]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch7  +3.3V   Vcc   %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 7],  spass_fail[adc_err_base[ 7]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch8  +5.65V1 Vadb  %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 8],  spass_fail[adc_err_base[ 8]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch9  +5.65V2 Vadb  %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 9],  spass_fail[adc_err_base[ 9]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch10 +Tdegc  Vtemp %12.3f C      %s\n",itest,iadc,vadc_base[iadc][10],  spass_fail[adc_err_base[10]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch11 +0.612  Vref/2%12.3f V      %s\n",itest,iadc,vadc_base[iadc][11],  spass_fail[adc_err_base[11]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch12 +0.000  Vzero %12.3f V      %s\n",itest,iadc,vadc_base[iadc][12],  spass_fail[adc_err_base[12]].c_str());  itest++;
+    fprintf(stdout," \t%2i ALCT ADC%i Ch13 +1.224  Vref  %12.3f V      %s\n",itest,iadc,vadc_base[iadc][13],  spass_fail[adc_err_base[13]].c_str());  itest++;
 
-    itest=25;
-    fprintf(test_file,"%2i ALCT ADC2 Ch2  +1.8A   Acore %12.3f A      %s\n",itest,vadc_base[iadc][ 2],  spass_fail[adc_err_base[ 2]].c_str());  itest++;
-    if (alct_board_id==801){fprintf(test_file,"%2i ALCT ADC2 Ch3  +3.3A   Abase %12.3f A      %s\n",itest,vadc_base[iadc][ 3],   "SKIP");   itest++;}
-    else                   {fprintf(test_file,"%2i ALCT ADC2 Ch3  +3.3A   Abase %12.3f A      %s\n",itest,vadc_base[iadc][ 3],  spass_fail[adc_err_base[ 3]].c_str());  itest++;}
-    fprintf(test_file,"%2i ALCt ADC2 Ch4  +5.65A1 Aadb  %12.3f A      %s\n",itest,vadc_base[iadc][ 4],  spass_fail[adc_err_base[ 4]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch5  +5.65A2 Aadb  %12.3f A      %s\n",itest,vadc_base[iadc][ 5],  spass_fail[adc_err_base[ 5]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch6  +1.8V   Vcore %12.3f V      %s\n",itest,vadc_base[iadc][ 6],  spass_fail[adc_err_base[ 6]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch7  +3.3V   Vcc   %12.3f V      %s\n",itest,vadc_base[iadc][ 7],  spass_fail[adc_err_base[ 7]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch8  +5.65V1 Vadb  %12.3f V      %s\n",itest,vadc_base[iadc][ 8],  spass_fail[adc_err_base[ 8]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch9  +5.65V2 Vadb  %12.3f V      %s\n",itest,vadc_base[iadc][ 9],  spass_fail[adc_err_base[ 9]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch10 +Tdegc  Vtemp %12.3f C      %s\n",itest,vadc_base[iadc][10],  spass_fail[adc_err_base[10]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch11 +0.612  Vref/2%12.3f V      %s\n",itest,vadc_base[iadc][11],  spass_fail[adc_err_base[11]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch12 +0.000  Vzero %12.3f V      %s\n",itest,vadc_base[iadc][12],  spass_fail[adc_err_base[12]].c_str());  itest++;
-    fprintf(test_file,"%2i ALCT ADC2 Ch13 +1.224  Vref  %12.3f V      %s\n",itest,vadc_base[iadc][13],  spass_fail[adc_err_base[13]].c_str());  itest++;
+    itest,iadc=25;
+    fprintf(test_file,"%2i ALCT ADC%i Ch2  +1.8A   Acore %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 2],  spass_fail[adc_err_base[ 2]].c_str());  itest++;
+    if (alct_board_id==801){fprintf(test_file,"%2i ALCT ADC%i Ch3  +3.3A   Abase %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 3],   "SKIP");   itest++;}
+    else                   {fprintf(test_file,"%2i ALCT ADC%i Ch3  +3.3A   Abase %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 3],  spass_fail[adc_err_base[ 3]].c_str());  itest++;}
+    fprintf(test_file,"%2i ALCt ADC%i Ch4  +5.65A1 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 4],  spass_fail[adc_err_base[ 4]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch5  +5.65A2 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 5],  spass_fail[adc_err_base[ 5]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch6  +1.8V   Vcore %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 6],  spass_fail[adc_err_base[ 6]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch7  +3.3V   Vcc   %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 7],  spass_fail[adc_err_base[ 7]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch8  +5.65V1 Vadb  %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 8],  spass_fail[adc_err_base[ 8]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch9  +5.65V2 Vadb  %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 9],  spass_fail[adc_err_base[ 9]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch10 +Tdegc  Vtemp %12.3f C      %s\n",itest,iadc,vadc_base[iadc][10],  spass_fail[adc_err_base[10]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch11 +0.612  Vref/2%12.3f V      %s\n",itest,iadc,vadc_base[iadc][11],  spass_fail[adc_err_base[11]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch12 +0.000  Vzero %12.3f V      %s\n",itest,iadc,vadc_base[iadc][12],  spass_fail[adc_err_base[12]].c_str());  itest++;
+    fprintf(test_file,"%2i ALCT ADC%i Ch13 +1.224  Vref  %12.3f V      %s\n",itest,iadc,vadc_base[iadc][13],  spass_fail[adc_err_base[13]].c_str());  itest++;
 
     itest=25-2;
     for (i=2; i<=13; ++i)
@@ -5708,7 +5723,7 @@ start_sctest:
 
             abs_err = abs(int(adc_error[ithr][dac_data]));
 
-            if (abs_err >=8) {bad_thr[ithr]++; nerrors++;}
+            if (abs_err > 8) {bad_thr[ithr]++; nerrors++;}
             if (abs_err >= max_err) max_err=abs_err;
 
             if (abs_err > 8)
@@ -5727,8 +5742,31 @@ start_sctest:
         itest++;
     }   // for ithr
 
-// Test 61: Single Cable Test
-    itest=61;
+
+
+// Test ??: delay ASICs test
+
+    fprintf(stdout, "\t%2i ALCT Delay ASICs Write Test\n", itest); 
+
+
+    int L2100(); 
+    int delay_err_cnt = L2100(); 
+
+    if (delay_err_cnt==0) alct_npassed[itest]=1;
+    else                  alct_nfailed[itest]=1;
+
+    ipf = (delay_err_cnt!=0); 
+
+    fprintf(stdout, "\n");
+    fprintf(stdout, "\t%2i ALCT Delay ASICs Write Test %s %2i errs %s\n",itest,spaces[12].c_str(),delay_err_cnt,spass_fail[ipf].c_str());
+    fprintf(test_file,"%2i ALCT Delay ASICs Write Test %s %2i errs %s\n",itest,spaces[12].c_str(),delay_err_cnt,spass_fail[ipf].c_str());
+
+
+// Test ??: Single Cable Test
+
+    itest++;
+
+    int sc_itest_finish = itest + 41; 
 
     fprintf(stdout,"\n");
     fprintf(stdout, "\tStarting Single Cable Test\n");
@@ -5938,7 +5976,7 @@ na: printf("\tCR to advance to ADB channel %2i connector %2i or skip|exit|lbtest
     gets(line);
     if (line[0]==NULL)                {itest++; goto adb_loop_sc;}
     if (line[0]=='E' || line[0]=='e') goto alct_auto_done;
-    if (line[0]=='L' || line[0]=='l') {for (i=itest;i<=80;++i) alct_nskipped[itest]=1; goto start_lbtest;}
+    if (line[0]=='L' || line[0]=='l') {for (i=itest;i<=sc_itest_finish;++i) alct_nskipped[itest]=1; goto start_lbtest;}
     if (line[0]=='S' || line[0]=='s')
     {
         alct_nskipped[itest]=1;
@@ -5994,12 +6032,16 @@ start_lbtest:
     goto start_lbtest;
 
 skip_lb:
-    for (itest=81; itest<=85; ++itest) alct_nskipped[itest]=1;
+
+    itest++; 
+    int lbtest_start=itest; 
+    int lbtest_max = itest + 4; 
+
+    for (itest=lbtest_start; itest<=lbtest_max; ++itest) alct_nskipped[itest]=1;
     goto alct_auto_done;
 
-// Test 81: Hard reset ALCT then read Spartan-6 and Slow control firmware versions to check for automatic PROM load
+// Test 102: Hard reset ALCT then read Spartan-6 and Slow control firmware versions to check for automatic PROM load
 run_lbtest:
-    itest=81;
 
     status  = vme_read(boot_adr,rd_data);                   // Get current boot reg
     wr_data = rd_data | 0x0100;                             // Hard reset ALCT to check that FPGAs load from PROMs automatically
@@ -6111,9 +6153,10 @@ run_lbtest:
     }
 
 //------------------------------------------------------------------------------
-//  Test 82: Spartan-6 mezzanine ADC
+//  Test ??: Spartan-6 mezzanine ADC
 //------------------------------------------------------------------------------
-    itest = 82;
+//
+    itest++; 
 
     ichain    = 0x2;        // ALCT Mezzanine control jtag chain
     adr       = boot_adr;   // Boot register address
@@ -6184,10 +6227,10 @@ run_lbtest:
         fprintf(test_file, " %3.0fF", temperatures[i]);
 
 //------------------------------------------------------------------------------
-//  Test 83: ALCT rxd clock delay scan: ALCT-to-TMB Teven|Todd
+//  Test ??: ALCT rxd clock delay scan: ALCT-to-TMB Teven|Todd
 //------------------------------------------------------------------------------
 rx_scan:
-    itest = 83;
+    itest++; 
     unit  = test_file;
     debug = false;
 
@@ -6504,9 +6547,9 @@ rx_scan:
     status  = vme_write(adr,wr_data);
 
 //------------------------------------------------------------------------------
-//  Test 84: ALCT txd clock delay scan: TMB-to-ALCT Teven|Todd Loopback
+//  Test ??: ALCT txd clock delay scan: TMB-to-ALCT Teven|Todd Loopback
 //------------------------------------------------------------------------------
-    itest=84;
+    itest++;
 
 //  fprintf(stdout,"\n");
 //  fprintf(stdout,"\t%2i ALCT txd clock delay scan: ALCT-to-TMB Teven|Todd Loopback\n",itest);
@@ -6855,9 +6898,9 @@ rx_scan:
     status  = vme_write(adr,wr_data);
 
 //------------------------------------------------------------------------------
-//  Test 85: ALCT Tx|Rx default delays TMB-to-ALCT Walking 1 Loopback
+//  Test ??: ALCT Tx|Rx default delays TMB-to-ALCT Walking 1 Loopback
 //------------------------------------------------------------------------------
-    itest=85;
+    itest++; 
 
 //  fprintf(stdout,"\t%2i ALCT tx+rx default delays TMB-to-ALCT Walking 1 Loopback\n",itest);
 //  fprintf(unit,    "%2i ALCT tx+rx default delays TMB-to-ALCT Walking 1 Loopback\n",itest);
@@ -7081,10 +7124,10 @@ rx_scan:
     fprintf(test_file,"%2i ALCT walking 1 loopback nbad=%4i %s %s\n",itest,nbad,spaces[14].c_str(),spass_fail[ipf].c_str());
 
 //------------------------------------------------------------------------------
-//  Test 86: ALCT Txd|Rxd clock delay scan TMB-to-ALCT TMB Random Loopback
+//  Test ??: ALCT Txd|Rxd clock delay scan TMB-to-ALCT TMB Random Loopback
 //------------------------------------------------------------------------------
     goto skip86;        // takes long time, and results suck
-    itest=86;
+    itest++; 
 
 //  fprintf(stdout,"\t%2i ALCT Txd|Rxd clock delay scan TMB-to-ALCT TMB Random Loopback\n",itest);
 //  fprintf(unit,     "%2iALCT Txd|Rxd clock delay scan TMB-to-ALCT TMB Random Loopback\n",itest);
@@ -7460,7 +7503,9 @@ alct_auto_done:
     alct_npass = 0;
     alct_nskip = 0;
 
-    for (itest=1; itest<=alct_ntests; ++itest)
+    int alct_ntests_max = itest; 
+
+    for (itest=1; itest<=alct_ntests_max; ++itest)
     {
     alct_nfail = alct_nfail + alct_nfailed[itest];
     alct_npass = alct_npass + alct_npassed[itest];
@@ -7613,15 +7658,139 @@ alct_auto_done:
 //------------------------------------------------------------------------------
 //  Set ALCT ASIC delays
 //------------------------------------------------------------------------------
-void L2100() {
+void write_asic_delays (int ibank, int idly, int tpat,  char tdi[], char tdo[] ) {
+
+
+// Set ASIC bank 0-3: 24 ASICs are grouped into up to 7 banks of 6 chips
+
+    // ALCT672=7
+    // ALCT384=4
+    // ALCT288=3
+
+    int nbanks = mxadbs()/6;
+
+    adr = boot_adr;                                     // Boot register address
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+    // Switch to ALCT mez JTAG chain
+
+    adr     = boot_adr;                                     // Boot register address
+    ichain  = 0x02;                                         // ALCT Mezzanine user jtag chain
+    chip_id = 0;                                            // ALCT Mezzanine user jtag path has 1 chip
+
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+    opcode = 0x1D; 
+    reg_len = 3; 
+
+    tdi[0] = (ibank >> 0) & 0x1;
+    tdi[1] = (ibank >> 1) & 0x1;
+    tdi[2] = (ibank >> 2) & 0x1;
+
+
+    // select bank to write to 
+    //--------------------------------------------------------------------------------
+
+    // Write data to selected opcode
+
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+    // Read data at selected opcode
+
+    opcode = 0x1C; 
+
+    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+    //printf("\tOpcode=%2X Length=%3i rd=",opcode,reg_len); 
+    //if (reg_len>0) {for (i=reg_len-1;i>=0;--i) printf("%1i",tdo[i]); printf("\n");}
+    //  else printf("x\n");
+
+    // Set individual chip delays
+    idelay_bit[0]=(idelay>>0) & 0x1;
+    idelay_bit[1]=(idelay>>1) & 0x1;
+    idelay_bit[2]=(idelay>>2) & 0x1;
+    idelay_bit[3]=(idelay>>3) & 0x1;
+
+    int T[6][4];
+    int C[6][16];
+
+    for (ichip=0;ichip<6;++ichip) {
+        for (ibit =0;ibit <4;++ibit ) {
+            T[ichip][ibit]=(idly>>ibit)&0x1; 
+        }
+    }
+
+    for (ichip=0;ichip<6;++ichip)  {
+        for (int ichan=0;ichan<16;++ichan) {
+            C[ichip][ichan]=(tpat>>ichan) & 0x1;
+        }
+    }
+
+    // Shift in 20 bits per chip x 6 chips: 1st T4,T3,T2,T1, C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,C14,C15,C16 last_in
+    nframes = 120;
+    for (i=0; i<nframes; ++i) tdi[i]=0; // TDI= data bits T[4:1] and C[16:1]
+
+    for (ichip=0;ichip<6;++ichip)
+    {
+        tdi[ichip*20+ 0]=T[ichip][3];
+        tdi[ichip*20+ 1]=T[ichip][2];
+        tdi[ichip*20+ 2]=T[ichip][1];
+        tdi[ichip*20+ 3]=T[ichip][0];
+
+        tdi[ichip*20+ 4]=C[ichip][0];
+        tdi[ichip*20+ 5]=C[ichip][1];
+        tdi[ichip*20+ 6]=C[ichip][2];
+        tdi[ichip*20+ 7]=C[ichip][3];
+
+        tdi[ichip*20+ 8]=C[ichip][4];
+        tdi[ichip*20+ 9]=C[ichip][5];
+        tdi[ichip*20+10]=C[ichip][6];
+        tdi[ichip*20+11]=C[ichip][7];
+
+        tdi[ichip*20+12]=C[ichip][8];
+        tdi[ichip*20+13]=C[ichip][9];
+        tdi[ichip*20+14]=C[ichip][10];
+        tdi[ichip*20+15]=C[ichip][11];
+
+        tdi[ichip*20+16]=C[ichip][12];
+        tdi[ichip*20+17]=C[ichip][13];
+        tdi[ichip*20+18]=C[ichip][14];
+        tdi[ichip*20+19]=C[ichip][15];
+    };
+
+    opcode = 0x1B; 
+
+    reg_len = nframes; 
+
+    // Write data to selected opcode
+
+    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+    // Read data at selected opcode
+
+    opcode = 0x1A; 
+
+    vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+    reg_len ++; 
+
+    vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+    vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+}
+int L2100() {
 //L2100:
-    int idelay=15;
-    // inquire("\tDelay[0-15] <cr>=%2i ", 0,15, 10, idelay);
 
 // Get initial boot register
     status = vme_read(boot_adr,rd_data);    // Get current boot reg
     int boot_data_initial = rd_data;
-    printf("\tBoot=%4.4X Adr=%6.6X\n",rd_data,boot_adr);
+    //printf("\tBoot=%4.4X Adr=%6.6X\n",rd_data,boot_adr);
 
     for (i=0; i<=15; ++i) {boot_decode[i]=(rd_data >> i) & 0x1;}
 
@@ -7643,151 +7812,50 @@ void L2100() {
     const int idlytst_max = 6; 
     int idly_pattern [idlytst_max] = {0xffff,0x0000,0x5555,0xAAAA,0x6666,0x9999}; 
 
-    int pat; 
+    int tpat; 
 
     for (int idlytst=0; idlytst<idlytst_max; idlytst++) {
 
-    idelay=0xf & idly_pattern[idlytst]; 
-    pat = idly_pattern[idlytst]; 
+    idelay = 0xf & idly_pattern[idlytst]; 
+    tpat   = idly_pattern[idlytst]; 
 
     for (ibank=0;ibank<nbanks;++ibank) {
 
 
-        printf("\tWriting ASIC delays for bank %i\n", ibank); 
-
-
-    // Switch to ALCT mez JTAG chain
-        adr     = boot_adr;                                     // Boot register address
-        ichain  = 0x02;                                         // ALCT Mezzanine user jtag chain
-        chip_id = 0;                                            // ALCT Mezzanine user jtag path has 1 chip
-
-        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
-
-        opcode = 0x1D; 
-        reg_len = 3; 
-
-        tdi[0] = (ibank >> 0) & 0x1;
-        tdi[1] = (ibank >> 1) & 0x1;
-        tdi[2] = (ibank >> 2) & 0x1;
-
-    // Write data to selected opcode
-        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
-        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
-        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
-
-    // Read data at selected opcode
-
-        opcode = 0x1C; 
-
-        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
-        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
-
-        printf("\tOpcode=%2X Length=%3i rd=",opcode,reg_len); 
-        if (reg_len>0) {for (i=reg_len-1;i>=0;--i) printf("%1i",tdo[i]); printf("\n");}
-        else printf("x\n");
-
-        // Set individual chip delays
-        idelay_bit[0]=(idelay>>0) & 0x1;
-        idelay_bit[1]=(idelay>>1) & 0x1;
-        idelay_bit[2]=(idelay>>2) & 0x1;
-        idelay_bit[3]=(idelay>>3) & 0x1;
-
-        int             T[6][4];
-        int             C[6][16];
-
-        for (ichip=0;ichip<6;++ichip) {
-            for (ibit =0;ibit <4;++ibit ) {
-                T[ichip][ibit]=idelay_bit[ibit];
-            }
-        }
-
-        for (ichip=0;ichip<6;++ichip)  {
-            for (int ichan=0;ichan<16;++ichan) {
-                C[ichip][ichan]=(pat>>ichan) & 0x1;
-            }
-        }
-
-        // Shift in 20 bits per chip x 6 chips: 1st T4,T3,T2,T1, C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,C14,C15,C16 last_in
-        nframes = 120;
-        for (i=0; i<nframes; ++i) tdi[i]=0; // TDI= data bits T[4:1] and C[16:1]
-
-        for (ichip=0;ichip<6;++ichip)
-        {
-            tdi[ichip*20+ 0]=T[ichip][3];
-            tdi[ichip*20+ 1]=T[ichip][2];
-            tdi[ichip*20+ 2]=T[ichip][1];
-            tdi[ichip*20+ 3]=T[ichip][0];
-
-            tdi[ichip*20+ 4]=C[ichip][0];
-            tdi[ichip*20+ 5]=C[ichip][1];
-            tdi[ichip*20+ 6]=C[ichip][2];
-            tdi[ichip*20+ 7]=C[ichip][3];
-
-            tdi[ichip*20+ 8]=C[ichip][4];
-            tdi[ichip*20+ 9]=C[ichip][5];
-            tdi[ichip*20+10]=C[ichip][6];
-            tdi[ichip*20+11]=C[ichip][7];
-
-            tdi[ichip*20+12]=C[ichip][8];
-            tdi[ichip*20+13]=C[ichip][9];
-            tdi[ichip*20+14]=C[ichip][10];
-            tdi[ichip*20+15]=C[ichip][11];
-
-            tdi[ichip*20+16]=C[ichip][12];
-            tdi[ichip*20+17]=C[ichip][13];
-            tdi[ichip*20+18]=C[ichip][14];
-            tdi[ichip*20+19]=C[ichip][15];
-        };
-
-        opcode = 0x1B; 
-
-        reg_len = nframes; 
-
-        // Write data to selected opcode
-
-        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
-        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
-
-        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
-
-        int tdo_first = tdo[nframes-1]; 
-
-        // Read data at selected opcode
-
-        opcode = 0x1A; 
-
-        // int bit_burn=1; 
-
-        // vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
-        // vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,bit_burn); // Write tdi, read tdo
-
-        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
-
-        reg_len ++; 
-
-        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
-        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
-
-        printf("\ttdi = ");
-        for(i=0;i<nframes;++i)
-            printf("%1i",tdi[i]);
-        printf("\n");
-
-
-        printf("\ttdo = ");
-        //printf("%1i",tdo_first);
-        for (i=1;i<nframes+1;++i)
-            printf("%1i",tdo[i]);
-        printf("\n");
+        write_asic_delays (ibank, idelay, tpat, tdi, tdo); 
 
         int err=0; 
-        printf("\terr = ");
         for (i=0;i<nframes;++i) {
             char err_c = (tdi[i]^tdo[i+1])==1 ? 'X' : '_'; 
             if ((tdi[i]^tdo[i+1])==1) err=1;
-            printf("%c", err_c);
         }
-        printf("\n");
+
+        if (err) {
+            printf("\t   ALCT Delay ASICs wr=%4x for bank %i              FAIL\n", idly_pattern[idlytst], ibank); 
+
+            printf("\tbank%i err = ", ibank);
+            for (i=0;i<nframes;++i) {
+                char err_c = (tdi[i]^tdo[i+1])==1 ? 'X' : '_'; 
+                if ((tdi[i]^tdo[i+1])==1) err=1;
+            }
+
+            printf("\n");
+
+            printf("\tbank%i tdi = ", ibank);
+            for(i=0;i<nframes;++i)
+                printf("%1i",tdi[i]);
+            printf("\n");
+
+            printf("\tbank%i tdo = ", ibank);
+            //printf("%1i",tdo_first);
+            for (i=1;i<nframes+1;++i)
+                printf("%1i",tdo[i]);
+            printf("\n");
+        }
+        else  {
+            printf("\t   ALCT Delay ASICS wr=%4x for bank %i              PASS\n", idly_pattern[idlytst], ibank); 
+        }
+
 
         if (err) err_cnt++; 
 
@@ -7795,14 +7863,8 @@ void L2100() {
     } // close idlytst
 
     printf("\n");
-    if   (err_cnt==0) 
-        printf("\tDelay ASICs Test PASSED\n"); 
-    else 
-        printf("\tDelay ASICs Test FAILED\n"); 
-
     // Done
-    printf("\t Done writing delay ASICs\n"); 
-    return;
+    return err_cnt;
 }
 //------------------------------------------------------------------------------
 //  ALCT Test Sub-Menu
@@ -8644,52 +8706,52 @@ int iadc_for_adb (int adb, bool return_channel) {
 
 // Determine ADC channel for this ithr
     switch (adb) {
-        case 0:  iadc=4; adc_ch=1;      break;
-        case 1:  iadc=4; adc_ch=0;      break;
+        case 0:  iadc=2; adc_ch=1;      break;
+        case 1:  iadc=2; adc_ch=0;      break;
 
-        case 2:  iadc=3; adc_ch=10;     break;
-        case 3:  iadc=3; adc_ch=9;      break;
-        case 4:  iadc=3; adc_ch=8;      break;
-        case 5:  iadc=3; adc_ch=7;      break;
-        case 6:  iadc=3; adc_ch=6;      break;
-        case 7:  iadc=3; adc_ch=5;      break;
-        case 8:  iadc=3; adc_ch=4;      break;
-        case 9:  iadc=3; adc_ch=3;      break;
-        case 10: iadc=3; adc_ch=2;      break;
-        case 11: iadc=3; adc_ch=1;      break;
-        case 12: iadc=3; adc_ch=0;      break;
+        case 2:  iadc=1; adc_ch=10;     break;
+        case 3:  iadc=1; adc_ch=9;      break;
+        case 4:  iadc=1; adc_ch=8;      break;
+        case 5:  iadc=1; adc_ch=7;      break;
+        case 6:  iadc=1; adc_ch=6;      break;
+        case 7:  iadc=1; adc_ch=5;      break;
+        case 8:  iadc=1; adc_ch=4;      break;
+        case 9:  iadc=1; adc_ch=3;      break;
+        case 10: iadc=1; adc_ch=2;      break;
+        case 11: iadc=1; adc_ch=1;      break;
+        case 12: iadc=1; adc_ch=0;      break;
 
-        case 13: iadc=2; adc_ch=10;     break;
-        case 14: iadc=2; adc_ch=9;      break;
-        case 15: iadc=2; adc_ch=8;      break;
-        case 16: iadc=2; adc_ch=7;      break;
-        case 17: iadc=2; adc_ch=6;      break;
-        case 18: iadc=2; adc_ch=5;      break;
-        case 19: iadc=2; adc_ch=4;      break;
-        case 20: iadc=2; adc_ch=3;      break;
-        case 21: iadc=2; adc_ch=2;      break;
-        case 22: iadc=2; adc_ch=1;      break;
-        case 23: iadc=2; adc_ch=0;      break;
+        case 13: iadc=0; adc_ch=10;     break;
+        case 14: iadc=0; adc_ch=9;      break;
+        case 15: iadc=0; adc_ch=8;      break;
+        case 16: iadc=0; adc_ch=7;      break;
+        case 17: iadc=0; adc_ch=6;      break;
+        case 18: iadc=0; adc_ch=5;      break;
+        case 19: iadc=0; adc_ch=4;      break;
+        case 20: iadc=0; adc_ch=3;      break;
+        case 21: iadc=0; adc_ch=2;      break;
+        case 22: iadc=0; adc_ch=1;      break;
+        case 23: iadc=0; adc_ch=0;      break;
 
-        case 24: iadc=1; adc_ch=0;      break;
-        case 25: iadc=1; adc_ch=1;      break;
-        case 26: iadc=1; adc_ch=2;      break;
-        case 27: iadc=1; adc_ch=3;      break;
-        case 28: iadc=1; adc_ch=4;      break;
-        case 29: iadc=1; adc_ch=5;      break;
-        case 30: iadc=1; adc_ch=6;      break;
-        case 31: iadc=1; adc_ch=7;      break;
-        case 32: iadc=1; adc_ch=8;      break;
+        case 24: iadc=3; adc_ch=0;      break;
+        case 25: iadc=3; adc_ch=1;      break;
+        case 26: iadc=3; adc_ch=2;      break;
+        case 27: iadc=3; adc_ch=3;      break;
+        case 28: iadc=3; adc_ch=4;      break;
+        case 29: iadc=3; adc_ch=5;      break;
+        case 30: iadc=3; adc_ch=6;      break;
+        case 31: iadc=3; adc_ch=7;      break;
+        case 32: iadc=3; adc_ch=8;      break;
 
-        case 33: iadc=0; adc_ch=0;      break;
-        case 34: iadc=0; adc_ch=1;      break;
-        case 35: iadc=0; adc_ch=2;      break;
-        case 36: iadc=0; adc_ch=3;      break;
-        case 37: iadc=0; adc_ch=4;      break;
-        case 38: iadc=0; adc_ch=5;      break;
-        case 39: iadc=0; adc_ch=6;      break;
-        case 40: iadc=0; adc_ch=7;      break;
-        case 41: iadc=0; adc_ch=8;      break;
+        case 33: iadc=4; adc_ch=0;      break;
+        case 34: iadc=4; adc_ch=1;      break;
+        case 35: iadc=4; adc_ch=2;      break;
+        case 36: iadc=4; adc_ch=3;      break;
+        case 37: iadc=4; adc_ch=4;      break;
+        case 38: iadc=4; adc_ch=5;      break;
+        case 39: iadc=4; adc_ch=6;      break;
+        case 40: iadc=4; adc_ch=7;      break;
+        case 41: iadc=4; adc_ch=8;      break;
     }
 
     // compensate for the fact that the 288 and 384 have 3 ADCs instead

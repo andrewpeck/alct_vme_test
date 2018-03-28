@@ -90,7 +90,7 @@
     const int       ALCT384     = 1;
     const int       ALCT672     = 2;
 
-    const int       alct_type   = ALCT672;
+    const int       alct_type   = ALCT384;
 
     const int       mxframe     = 8192; // Max raw hits frame number, scope adds 512*160/16=5120 frames
     const int       mxtbins     = 32;   // Highest time bin, 0 implies 32
@@ -501,6 +501,7 @@
 
     int             get_alct_fpga_type        (); 
     std::string     get_alct_fpga_type_string (); 
+    int             alct_fpga_type; 
 
 
 //------------------------------------------------------------------------------
@@ -2499,32 +2500,33 @@ L800:
 //
 //  Mezzanie Virtex Control Registers (5-bit opcode)
 //
-    int alct_reg_len[0x20]={0};
+    int alct_reg_len [0x20]={0};
+    int alct_reg_list[0x20]={0};
 
-//  Name                OpCode  Length                              Dir     Function
-//  ------------        ---     -----------------------------       -----   ------------------
-    IDRead        = 0x0;    alct_reg_len[IDRead]        = 40;   //  read    Virtex ID register
-    HCMaskRead    = 0x1;    alct_reg_len[HCMaskRead]    = 384;  //  read    hot mask
-    HCMaskWrite   = 0x2;    alct_reg_len[HCMaskWrite]   = 384;  //  write   hot mask
-    RdTrig        = 0x3;    alct_reg_len[RdTrig]        = 5;    //  read    trigger register
-    WrTrig        = 0x4;    alct_reg_len[WrTrig]        = 5;    //  write   trigger register
-    RdCfg         = 0x6;    alct_reg_len[RdCfg]         = 69;   //  read    control register
-    WrCfg         = 0x7;    alct_reg_len[WrCfg]         = 69;   //  write   control register
-    Wdly          = 0xd;    alct_reg_len[Wdly]          = 120;  //  write   delay lines. cs_dly bits in Par
-    Rdly          = 0xe;    alct_reg_len[Rdly]          = 121;  //  read    delay lines. cs_dly bits in Par
-    CollMaskRead  = 0x13;   alct_reg_len[CollMaskRead ] = 224;  //  read    collision pattern mask
-    CollMaskWrite = 0x14;   alct_reg_len[CollMaskWrite] = 224;  //  write   collision pattern mask
-    ParamRegRead  = 0x15;   alct_reg_len[ParamRegRead]  = 6;    //  read    delay line control register actually
-    ParamRegWrite = 0x16;   alct_reg_len[ParamRegWrite] = 6;    //  read    delay line control register actually
-    InputEnable   = 0x17;   alct_reg_len[InputEnable]   = 0;    //  write?  commands to disable and enable input
-    InputDisable  = 0x18;   alct_reg_len[InputDisable]  = 0;    //  write?  commands to disable and enable input
-    YRwrite       = 0x19;   alct_reg_len[YRwrite]       = 31;   //  write   output register (for debugging with UCLA test board)
-    OSread        = 0x1a;   alct_reg_len[OSread]        = 49;   //  read    output storage
-    SNread        = 0x1b;   alct_reg_len[SNread]        = 1;    //  read    one bit of serial number
-    SNwrite0      = 0x1c;   alct_reg_len[SNwrite0]      = 0;    //  write   0 bit into serial number chip
-    SNwrite1      = 0x1d;   alct_reg_len[SNwrite1]      = 0;    //  write   1 bit into serial number chip
-    SNreset       = 0x1e;   alct_reg_len[SNreset]       = 0;    //  write   reset serial number chip
-    Bypass        = 0x1f;   alct_reg_len[Bypass]        = 1;    //  bypass
+//  Name           OpCode   alct_reg_list[0]                  Length                              Dir     Function
+//  ------------   ---                                        -----------------------------       -----   ------------------
+    IDRead        = 0x0;    alct_reg_list[0x0]  = IDRead       ; alct_reg_len[IDRead]        = 40;   //  read    Virtex ID register
+    HCMaskRead    = 0x1;    alct_reg_list[0x1]  = HCMaskRead   ; alct_reg_len[HCMaskRead]    = 384;  //  read    hot mask
+    HCMaskWrite   = 0x2;    alct_reg_list[0x2]  = HCMaskWrite  ; alct_reg_len[HCMaskWrite]   = 384;  //  write   hot mask
+    RdTrig        = 0x3;    alct_reg_list[0x3]  = RdTrig       ; alct_reg_len[RdTrig]        = 5;    //  read    trigger register
+    WrTrig        = 0x4;    alct_reg_list[0x4]  = WrTrig       ; alct_reg_len[WrTrig]        = 5;    //  write   trigger register
+    RdCfg         = 0x6;    alct_reg_list[0x5]  = RdCfg        ; alct_reg_len[RdCfg]         = 69;   //  read    control register
+    WrCfg         = 0x7;    alct_reg_list[0x6]  = WrCfg        ; alct_reg_len[WrCfg]         = 69;   //  write   control register
+    Wdly          = 0xd;    alct_reg_list[0x7]  = Wdly         ; alct_reg_len[Wdly]          = 120;  //  write   delay lines. cs_dly bits in Par
+    Rdly          = 0xe;    alct_reg_list[0x8]  = Rdly         ; alct_reg_len[Rdly]          = 121;  //  read    delay lines. cs_dly bits in Par
+    CollMaskRead  = 0x13;   alct_reg_list[0x9]  = CollMaskRead ; alct_reg_len[CollMaskRead ] = 224;  //  read    collision pattern mask
+    CollMaskWrite = 0x14;   alct_reg_list[0xA]  = CollMaskWrite; alct_reg_len[CollMaskWrite] = 224;  //  write   collision pattern mask
+    ParamRegRead  = 0x15;   alct_reg_list[0xB]  = ParamRegRead ; alct_reg_len[ParamRegRead]  = 6;    //  read    delay line control register actually
+    ParamRegWrite = 0x16;   alct_reg_list[0xC]  = ParamRegWrite; alct_reg_len[ParamRegWrite] = 6;    //  read    delay line control register actually
+    InputEnable   = 0x17;   alct_reg_list[0xD]  = InputEnable  ; alct_reg_len[InputEnable]   = 0;    //  write?  commands to disable and enable input
+    InputDisable  = 0x18;   alct_reg_list[0xE]  = InputDisable ; alct_reg_len[InputDisable]  = 0;    //  write?  commands to disable and enable input
+    YRwrite       = 0x19;   alct_reg_list[0xF]  = YRwrite      ; alct_reg_len[YRwrite]       = 31;   //  write   output register (for debugging with UCLA test board)
+    OSread        = 0x1a;   alct_reg_list[0x10] = OSread       ; alct_reg_len[OSread]        = 49;   //  read    output storage
+    SNread        = 0x1b;   alct_reg_list[0x11] = SNread       ; alct_reg_len[SNread]        = 1;    //  read    one bit of serial number
+    SNwrite0      = 0x1c;   alct_reg_list[0x12] = SNwrite0     ; alct_reg_len[SNwrite0]      = 0;    //  write   0 bit into serial number chip
+    SNwrite1      = 0x1d;   alct_reg_list[0x13] = SNwrite1     ; alct_reg_len[SNwrite1]      = 0;    //  write   1 bit into serial number chip
+    SNreset       = 0x1e;   alct_reg_list[0x14] = SNreset      ; alct_reg_len[SNreset]       = 0;    //  write   reset serial number chip
+    Bypass        = 0x1f;   alct_reg_list[0x15] = Bypass       ; alct_reg_len[Bypass]        = 1;    //  bypass
 
 //L900:
     printf("\tIDRead        = 0x0   40  read  Virtex ID register\n");
@@ -2551,7 +2553,33 @@ L800:
     printf("\tBypass        = 0x1F   1  bypass\n");
     printf("\t<cr>=exit\n");
 
+    pause("<cr>");
     inquire("\tALCT mez JTAG register opcode  %2X", 0, 0x1F, 16, opcode);
+
+    // dump
+    int ireg=0; 
+    for (ireg=0; ireg<0x16; ireg=ireg+1) {
+
+        opcode = alct_reg_list[ireg]; 
+
+        // Switch to ALCT mez JTAG chain
+            adr     = boot_adr;                                     // Boot register address
+            ichain  = 0x02;                                         // ALCT Mezzanine user jtag chain
+            chip_id = 0;                                            // ALCT Mezzanine user jtag path has 1 chip
+
+            vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        // Read data at selected opcode
+            reg_len = alct_reg_len[opcode];                         // Register length
+
+            vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+            vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+            printf("\tOpcode=%2X Length=%3i rd=",opcode,alct_reg_len[opcode]);
+            if   (reg_len>0) {for (i=reg_len-1;i>=0;--i) printf("%1i",tdo[i]); printf("\n");}
+            else             printf("x\n");
+    }
+
 
 // Switch to ALCT mez JTAG chain
     adr     = boot_adr;                                     // Boot register address
@@ -2706,7 +2734,7 @@ L10610:
 
 // Display Spartan-6 mezzanine ADC
 
-    int alct_fpga_type = get_alct_fpga_type();
+    alct_fpga_type = get_alct_fpga_type();
 
     fprintf(stdout,"\n");
     fprintf(stdout,"\tSpartan6 ADC\n");
@@ -5162,12 +5190,24 @@ vga_done:
     printf("\n");
 
 // Get ALCT base board and Spartan-6 mezzanine ID numbers
-    alct_board_id = 800;
-    mez_board_id  = 2000;
+
+    alct_fpga_type = get_alct_fpga_type(); 
+
+    alct_board_id = 880;
 
     i = alct_board_id;  inquire("\tEnter ALCT Base Board ID Number 800-880   [%4i] ",  800,  880,  10, i); alct_board_id = i;
-    // FIXME: mezzanine numbering scheme for new 2018 mezz cards?
+    if (alct_fpga_type==0x1506) {// S-6 150 
+    mez_board_id  = 2000;
     i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 2000-2200 [%4i] ", 2000, 2200,  10, i); mez_board_id  = i;
+    }
+    else if (alct_fpga_type==0x1006) {
+    mez_board_id  = 10000;
+    i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 10000-10320 [%4i] ", 10000, 10320,  10, i); mez_board_id  = i;
+    }
+    else if (alct_fpga_type==0x1516) {
+    mez_board_id  = 15000;
+    i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 15000-15120 [%4i] ", 15000, 15120,  10, i); mez_board_id  = i;
+    }
 
     sprintf(calct_board_id,"%3.3i",alct_board_id);
     sprintf(cmez_board_id, "%4.4i",mez_board_id);
@@ -5191,9 +5231,9 @@ vga_done:
         printf("\tSuggest you set ALCT_LogFolder=D:\\ALCT2011\\Testlogs\\ in System Properties/Advanced\n");
         printf("\tChanges take effect after reboot or user logoff/logon\n");
         printf("\n");}
-    else {
-        printf("\tEnvironment variable ALCT_LogFolder=%s\n",alct_logfolder);
-    }
+    // else {
+    //     printf("\tEnvironment variable ALCT_LogFolder=%s\n",alct_logfolder);
+    // }
 
     sfver=string(cfver);
     test_file_name = logfolder;
@@ -5236,7 +5276,9 @@ L1910:
     fprintf(stdout,"\tSingle Cable Test:\n");
     fprintf(stdout,"\tRequires alct_sctest.v firmware in the Spartan-6 ALCT mezzanine FPGA\n");
     fprintf(stdout,"\n");
-    fprintf(stdout,"\tStart Single Cable Test or skip to Loopback Test? yes|lbtest [yes] ");
+    fprintf(stdout,"\t===================================================================\n");
+    fprintf(stdout,"\tStart Single Cable Test or skip to Loopback Test? yes|lbtest [yes] \n");
+    fprintf(stdout,"\t===================================================================  ");
     gets(line);
     if (line[0]==NULL)                goto start_sctest;
     if (line[0]=='Y' || line[0]=='y') goto start_sctest;
@@ -5385,6 +5427,8 @@ start_sctest:
     opcode_wr = 0x09;       // ALCT mez ADC write opcode
     reg_len   = 5;          // Data register length
 
+    alct_fpga_type = get_alct_fpga_type(); 
+
     adc_read_alct(adr,ichain,chip_id,opcode_rd,opcode_wr,reg_len);
 
     // TODO: convert RSSI into a current
@@ -5403,50 +5447,48 @@ start_sctest:
     voltages_text.clear();
     temperatures_text.clear();
 
-    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v3p3_mez)  ; voltages_text.push_back("+3.3   Vcc    ") ;
-    tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v2p5_mez)  ; voltages_text.push_back("+2.5   Vccaux ") ;
-    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(vcore_mez) ; voltages_text.push_back("+1.8   Vcore  ") ;
-    tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p8_mez)  ; voltages_text.push_back("+1.8   Vccprom") ;
-    tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p2_mez)  ; voltages_text.push_back("+1.2   Vccint ") ;
-
-    long int alct_fpga_type = get_alct_fpga_type(); 
+    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v3p3_mez)  ; voltages_text.push_back("+3.3    Vcc    ") ;
+    tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v2p5_mez)  ; voltages_text.push_back("+2.5    Vccaux ") ;
+    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(vcore_mez) ; voltages_text.push_back("+1.8    Vcore  ") ;
+    tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p8_mez)  ; voltages_text.push_back("+1.8    Vccprom") ;
+    tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p2_mez)  ; voltages_text.push_back("+1.2    Vccint ") ;
 
     if (alct_fpga_type==0x1506) // S-6 150
     {
-    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); temperatures_errs.push_back(err_last); temperatures.push_back(tsink_mez_f)        ; temperatures_text.push_back("+Temp   TSink  ");
+    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); temperatures_errs.push_back(err_last); temperatures.push_back(tsink_mez_f)        ; temperatures_text.push_back  ("+Temp   TSink  ");
+    tok("Tfpga     S6 Mez ", tfpga_mez_f , 72.00 , .2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)    ; temperatures_text.push_back  ("+Temp   TFpga  ");
     }
     else if (alct_fpga_type==0x1006)
     {
-    tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5_mez)            ;     voltages_text.push_back("+1.2    Vccint ")     ;
-    tok("RSSI      S6 Mez ", vgbtx_rssi, 1.00,  0.1,     err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vgbtx_rssi)          ;     voltages_text.push_back("+1.2    Vccint ")     ;
-    tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez)       ; temperatures_text.push_back("+Tenp   TGBTX  ");
+    tok("+1.5V     S6 Mez ", v1p5_mez ,    1.500, 0.0250,  err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5_mez)            ;     voltages_text.push_back("+1.5    VCCGBT ");
+    tok("RSSI      S6 Mez ", vgbtx_rssi,   0.20,  0.10,    err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vgbtx_rssi)          ;     voltages_text.push_back("+1.2    VRSSI  ");
+    tok("Tgbtx     S6 Mez ", tgbtx_mez_f,  90.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez)       ; temperatures_text.push_back("+Temp   TGBTX  ");
+    tok("Tfpga     S6 Mez ", tfpga_mez_f , 90.00 , 0.200,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)     ; temperatures_text.push_back("+Temp   TFpga  ");
     }
     else if (alct_fpga_type==0x1516)
     {
-    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vcore_mez  )     ;     voltages_text.push_back("+1.2    Vccint ")     ;
-    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back("+Temp   TSink   ");
+    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vcore_mez  )     ;     voltages_text.push_back  ("+1.2    Vccint ");
+    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back  ("+Temp   TSink  ");
+    tok("Tfpga     S6 Mez ", tfpga_mez_f , 72.00 , .2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)    ; temperatures_text.push_back  ("+Temp   TFpga  ");
     }
 
-    tok("Tfpga     S6 Mez ", tfpga_mez_f , 72.00 , .2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)    ; temperatures_text.push_back("+Temp   TFpga  ") ;
-    tok("+vref/2   S6 Mez ", vref2_mez   , 1.250,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref2_mez)    ;     voltages_text.push_back("+vref/2 1.25V ") ;
-    tok("+vzero    S6 Mez ", vzero_mez   , 0.0,    .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vzero_mez)    ;     voltages_text.push_back("+vzero  0.00V ") ;
-    tok("+vref     S6 Mez ", vref_mez    , 2.499,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref_mez )    ;     voltages_text.push_back("+vref   2.50V ") ;
+    tok("+vref/2   S6 Mez ", vref2_mez   , 1.250,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref2_mez)    ;     voltages_text.push_back  ("+vref/2 1.25V  ");
+    tok("+vzero    S6 Mez ", vzero_mez   , 0.0,    .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vzero_mez)    ;     voltages_text.push_back  ("+vzero  0.00V  ");
+    tok("+vref     S6 Mez ", vref_mez    , 2.499,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref_mez )    ;     voltages_text.push_back  ("+vref   2.50V  ");
 
     if (voltages.size()>0)
     for (i=0; i<int(voltages.size()); i++) {
-        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
-        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V      %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V     %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V     %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
         itest++;
     }
 
     if (temperatures.size()>0)
     for (i=0; i<int(temperatures.size()); i++) {
-        fprintf(stdout,    "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i].c_str(), temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
-        fprintf(test_file, "\t%2i Spartan6 ADC %s %12.3f F      %s\n",itest,temperatures_text[i].c_str(), temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f F     %s\n",itest,temperatures_text[i].c_str(), temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f F     %s\n",itest,temperatures_text[i].c_str(), temperatures[i],  spass_fail[temperatures_errs[i]].c_str());
         itest++;
     }
-
-    itest=7;
 
     for (i=0; i<int(voltages_errs.size()); ++i)
     {
@@ -5461,7 +5503,6 @@ start_sctest:
     }
 
 // Test 21-23: Read ALCT base board FPGA and PROM ID codes
-    itest=21;
 
     ichain = 0x13;                                          // ALCT Spartan-6 mezzanine jtag chain
 
@@ -5508,7 +5549,6 @@ start_sctest:
     }   // Close for chip_id
 
 // Test 24: Slow Control Version ID
-    itest=24;
 
     adr     = boot_adr;                                     // Boot register address
     ichain  = 0x00;                                         // ALCT Mezzanine control user jtag chain
@@ -5531,6 +5571,9 @@ start_sctest:
     tdi_to_i4(&tdo[24], sc_id_day,      8, 0);
     tdi_to_i4(&tdo[32], sc_id_month,    8, 0);
 
+    sc_version_old = 0; 
+    sc_version_new = 0; 
+
     sc_version_old = (
         (sc_id_month    == 0x09)    &&
         (sc_id_day      == 0x07)    &&
@@ -5545,16 +5588,30 @@ start_sctest:
         (sc_id_version  == 0xA)     &&
         (sc_id_chip     == 0x6));
 
-    if (sc_version_new) {alct_npassed[itest]=1; ipf=0;} // require new because this program won't work with old, dunno why
-//  if (sc_version_old) {alct_npassed[itest]=1; ipf=0;}
-    else                {alct_nfailed[itest]=1; ipf=1;
-        fprintf(stdout, "\tPlease make sure that you are using the new slow control firmware version (11/28/2012)\n"); }
+    if (sc_version_new || sc_version_old ) {
+           alct_npassed[itest]=1; ipf=0;
+    }
+    else  {
+           alct_nfailed[itest]=1; ipf=1;
+    }
+
+    // if (sc_version_new) {
+    //     alct_npassed[itest]=1; ipf=0;
+    // } // require new because this program won't work with old, dunno why
+//  // if (sc_version_old) {alct_npassed[itest]=1; ipf=0;}
+    // else {
+    //     alct_nfailed[itest]=1; ipf=1;
+    //     fprintf(stdout, "\n\t======================================================================================\n"); 
+    //     fprintf(stdout, "\n\tPlease make sure that you are using the new slow control firmware version (11/28/2012)\n"); 
+    //     fprintf(stdout, "\n\t======================================================================================\n"); 
+    // }
 
     fprintf(stdout, "\t%2i Slow Control firmware  %2.2X/%2.2X/%4.4X  ver=%1X chip=%1X  %s\n",itest,sc_id_month,sc_id_day,sc_id_year,sc_id_version,sc_id_chip,spass_fail[ipf].c_str());
     fprintf(test_file,"%2i Slow Control firmware  %2.2X/%2.2X/%4.4X  ver=%1X chip=%1X  %s\n",itest,sc_id_month,sc_id_day,sc_id_year,sc_id_version,sc_id_chip,spass_fail[ipf].c_str());
 
 // Test 25: Slow Control Power Supply ADC
-    itest=25;
+
+    itest++; 
 
     adr     = boot_adr;                                     // Boot register address
     ichain  = 0x00;                                         // ALCT Mezzanine control user jtag chain
@@ -5582,30 +5639,35 @@ start_sctest:
 
         i4_to_tdi(i4=adc_word, &tdi[0], reg_len, 1);            // SPI=1 for DACs | ADCs that take MSB first
 
+        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
         vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
         vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
 
         tdi_to_i4(&tdo[0],i4,reg_len,1);                        // SPI=1 for DACs | ADCs that take MSB first
-        adc_ch = adc_adr-1;                                     // Data read at this adr is for previous channel
-        if (adc_adr > 0) adc_data[iadc][adc_ch] = i4;
+        adc_ch = adc_adr;                                       
+        adc_data[iadc][adc_ch] = 0x3ff & i4;
     }
 
     vref_sc = 1.225;
     vlsb_sc = vref_sc/1024;
 
-    for (adc_ch=0; adc_ch<=0xD; ++ adc_ch)
+    for (adc_ch=0; adc_ch<=13; adc_ch++)
     {
         if (iadc==2 && adc_ch==0xA) vadc_offset =  0.5;         // Subtract 500mV from temperature sensor, expect 750mV at 25C
-        else                                    vadc_offset =  0.0;
+        else                        vadc_offset =  0.0;
 
         vadc        = double(adc_data[iadc][adc_ch])*vlsb_sc;
         vadc_scaled = (vadc-vadc_offset) * adc_ch_scale[iadc][adc_ch];
         vadc_base[iadc][adc_ch] = vadc_scaled;
 
-        //  printf("\tADC channel %1X  %4i  %s  %5.3fV %6.3f%s\n",adc_ch, adc_data[iadc][adc_ch], adc_ch_name[iadc][adc_ch].c_str(), vadc, vadc_scaled, adc_ch_unit[iadc][adc_ch].c_str());
+        // printf("\tADC channel %1X  %4i  %s  %5.3fV %6.3f%s\n", adc_ch, adc_data[iadc][adc_ch], adc_ch_name[iadc][adc_ch].c_str(), vadc, vadc_scaled, adc_ch_unit[iadc][adc_ch].c_str());
     }   // close adc_ch
 
-    double i3v3_expect = (1.5/24.0 * mxadbs()); 
+    double i3v3_expect = (1.5/24.0 * mxadbs()) + ((alct_fpga_type==0x1006) ? 0.5 : 0); 
 
     for (i=0; i<=13; ++i) adc_err_base[i]=0;
 
@@ -5626,7 +5688,7 @@ start_sctest:
     fprintf(stdout, "\t%2i ALCT ADC%i Ch2  +1.8A   Acore %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 2],  spass_fail[adc_err_base[ 2]].c_str());  itest++;
     if (alct_board_id==801) {fprintf(stdout, "\t%2i ALCT ADC%i Ch3  +3.3A   Abase %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 3], "SKIP");    itest++;}
     else                    {fprintf(stdout, "\t%2i ALCT ADC%i Ch3  +3.3A   Abase %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 3], spass_fail[adc_err_base[ 3]].c_str());  itest++;}
-    fprintf(stdout, "\t%2i ALCt ADC%i Ch4  +5.65A1 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 4],  spass_fail[adc_err_base[ 4]].c_str());  itest++;
+    fprintf(stdout, "\t%2i ALCT ADC%i Ch4  +5.65A1 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 4],  spass_fail[adc_err_base[ 4]].c_str());  itest++;
     fprintf(stdout, "\t%2i ALCT ADC%i Ch5  +5.65A2 Aadb  %12.3f A      %s\n",itest,iadc,vadc_base[iadc][ 5],  spass_fail[adc_err_base[ 5]].c_str());  itest++;
     fprintf(stdout, "\t%2i ALCT ADC%i Ch6  +1.8V   Vcore %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 6],  spass_fail[adc_err_base[ 6]].c_str());  itest++;
     fprintf(stdout, "\t%2i ALCT ADC%i Ch7  +3.3V   Vcc   %12.3f V      %s\n",itest,iadc,vadc_base[iadc][ 7],  spass_fail[adc_err_base[ 7]].c_str());  itest++;
@@ -5660,7 +5722,7 @@ start_sctest:
     }
 
 // Test 37-60: Ramp Threshold DACs Read ADC
-    itest=37;
+    itest++; 
 
     adr     = boot_adr;                                     // Boot register address
     ichain  = 0x00;                                         // ALCT Mezzanine control user jtag chain
@@ -5733,7 +5795,7 @@ start_sctest:
 
             if (abs_err > 8)
             {
-                fprintf(stdout, "\tBad Threshold ithr=%2i,dac_data=%3i,adc_value=%4i,adc_err=%8.3f\n",ithr,dac_data,adc_value[ithr][dac_data],adc_error[ithr][dac_data]);
+                fprintf(stdout, "\t\t> Bad Threshold ithr=%2i,dac_data=%3i,adc_value=%4i,adc_err=%8.3f\n",ithr,dac_data,adc_value[ithr][dac_data],adc_error[ithr][dac_data]);
                 fprintf(test_file,"Bad Threshold ithr=%2i,dac_data=%3i,adc_value=%4i,adc_err=%8.3f\n",ithr,dac_data,adc_value[ithr][dac_data],adc_error[ithr][dac_data]);
             }
 
@@ -6197,8 +6259,8 @@ run_lbtest:
     else if (alct_fpga_type==0x1006)
     {
     tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last); adc_errs.push_back(err_last); voltages.push_back(v1p5_mez);
-    tok("RSSI      S6 Mez ", vgbtx_rssi, 1.00,  0.1,     err_last); adc_errs.push_back(err_last); voltages.push_back(vgbtx_rssi);
-    tok("Tgbtx     S6 Mez ", tgbtx_mez,  72.00, 0.2000,  err_last); adc_errs.push_back(err_last); temperatures.push_back(tgbtx_mez);
+    tok("RSSI      S6 Mez ", vgbtx_rssi, 0.20,  0.1,     err_last); adc_errs.push_back(err_last); voltages.push_back(vgbtx_rssi);
+    tok("Tgbtx     S6 Mez ", tgbtx_mez,  90.00, 0.2000,  err_last); adc_errs.push_back(err_last); temperatures.push_back(tgbtx_mez);
     }
     else if (alct_fpga_type==0x1516)
     {
@@ -6213,23 +6275,30 @@ run_lbtest:
     tok("+vref   S6 Mez ", vref_mez,    2.499,       .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vref_mez );
 
     ipf=0;
-    for (i=0; i<=int(adc_errs.size()); ++i)
+	if (adc_errs.size() > 0 ) 
+    for (i=0; i<int(adc_errs.size()); ++i)
         if (adc_errs[i]!=0) ipf=1;
 
     if (ipf==0) alct_npassed[itest]=1;
     else        alct_nfailed[itest]=1;
 
-    fprintf(stdout, "\t%2i Spartan6 ADC");
-    for (i=0; i<=int(voltages.size()); ++i)
-        fprintf(stdout, " %3.1fV", voltages[i]);
-    for (i=0; i<=int(temperatures.size()); ++i)
+    // fprintf(stdout, "\t%2i Spartan6 ADC");
+    // for (i=0; i<int(voltages.size()); ++i)
+    //     fprintf(stdout, " %3.1fV", voltages[i]);
+    // fprintf(stdout, "\n"); 
+
+    for (i=0; i<int(temperatures.size()); ++i)
         fprintf(stdout, " %3.0fF", temperatures[i]);
+    fprintf(stdout, "\n"); 
 
     fprintf(test_file, "\t%2i Spartan6 ADC");
-    for (i=0; i<=int(voltages.size()); ++i)
+    for (i=0; i<int(voltages.size()); ++i)
         fprintf(test_file, " %3.1fV", voltages[i]);
-    for (i=0; i<=int(temperatures.size()); ++i)
+    fprintf(stdout, "\n"); 
+
+    for (i=0; i<int(temperatures.size()); ++i)
         fprintf(test_file, " %3.0fF", temperatures[i]);
+    fprintf(stdout, "\n"); 
 
 //------------------------------------------------------------------------------
 //  Test ??: ALCT rxd clock delay scan: ALCT-to-TMB Teven|Todd
@@ -6806,7 +6875,7 @@ rx_scan:
 //  fprintf(unit,"\n");
 //  fprintf(stdout," width=%2i center=%2i\n",window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay]);
 
-    if (window_width[alct_txd_posneg][alct_tof_delay]  >= 8) {alct_npassed[itest]=1; ipf=0;}
+    if (window_width[alct_txd_posneg][alct_tof_delay]  >= 7) {alct_npassed[itest]=1; ipf=0;}
     else                                                     {alct_nfailed[itest]=1; ipf=1;}
 
     fprintf(stdout,"\t%2i ALCT txd clock delay scan: Width=%2i Center=%2i    %s\n",
@@ -7577,31 +7646,32 @@ alct_auto_done:
 //
 //  Mezzanie Virtex Control Registers (5-bit opcode)
 //
-    int alct_reg_len[0x1D]={0};
+    int alct_reg_len [0x1D]={0};
+    int alct_reg_list[0x1D]={0};
 
-//  Name                  OpCode    Length                                        Dir     Function
-//  ------------          ---       ---------------------------------------       -----   ------------------
-    int sc_bypass         = 0x0;    alct_reg_len[sc_bypass     ]    =   1;    //  read    
-    int sc_fpga_type      = 0x1;    alct_reg_len[sc_fpga_type  ]    =   16;   //  read   
-    int sc_monthday       = 0x2;    alct_reg_len[sc_monthday   ]    =   16;   //  read  
-    int sc_year           = 0x3;    alct_reg_len[sc_year       ]    =   16;   //  read    0x5555
-    int sc_todd           = 0x4;    alct_reg_len[sc_todd       ]    =   16;   //  read    0xAAAA
-    int sc_teven          = 0x5;    alct_reg_len[sc_teven      ]    =   16;   //  read    
-    int sc_dsn_rd         = 0x6;    alct_reg_len[sc_dsn_rd     ]    =   10;   //  read    
-    int sc_dsn_wr         = 0x7;    alct_reg_len[sc_dsn_wr     ]    =   10;   //  write   
-    int sc_adc_rd         = 0x8;    alct_reg_len[sc_adc_rd     ]    =   5;    //  read    
-    int sc_adc_wr         = 0x9;    alct_reg_len[sc_adc_wr     ]    =   5;    //  write   
-    int sc_adb_hit_rd     = 0xa;    alct_reg_len[sc_adb_hit_rd ]    =   42;   //  write   
-    int sc_crc_err_rd     = 0xb;    alct_reg_len[sc_crc_err_rd ]    =   1;    //  
-    int sc_adb_adr_rd     = 0x15;   alct_reg_len[sc_adb_adr_rd ]    =   9;    //  read    ADB connector channel readback
-    int sc_adb_adr_wr     = 0x16;   alct_reg_len[sc_adb_adr_wr ]    =   9;    //  write   ADB connector channel 0-41
-    int sc_adb_scsi_rd    = 0x17;   alct_reg_len[sc_adb_scsi_rd]    =   16;   //  read    SCSI data readback
-    int sc_adb_scsi_wr    = 0x18;   alct_reg_len[sc_adb_scsi_wr]    =   16;   //  write   SCSI data to write
-    int sc_adb_data_rd    = 0x19;   alct_reg_len[sc_adb_data_rd]    =   16;   //  read    ADB data read back via delay ASIC and multiplexers
-    int sc_dly_rd         = 0x1A;   alct_reg_len[sc_dly_rd     ]    =  120;   //  
-    int sc_dly_wr         = 0x1B;   alct_reg_len[sc_dly_wr     ]    =  120;   //  
-    int sc_dly_sel_rd     = 0x1C;   alct_reg_len[sc_dly_sel_rd ]    =   3;    //  
-    int sc_dly_sel_wr     = 0x1D;   alct_reg_len[sc_dly_sel_wr ]    =   3;    //  
+//  Name                  OpCode                             Length                                        Dir     Function
+//  ------------          ---                                ---------------------------------------       -----   ------------------
+    int sc_bypass         = 0x0;    alct_reg_list[0x0]  = sc_bypass       ; alct_reg_len[sc_bypass     ]    =   1;    //  read    
+    int sc_fpga_type      = 0x1;    alct_reg_list[0x1]  = sc_fpga_type    ; alct_reg_len[sc_fpga_type  ]    =   16;   //  read   
+    int sc_monthday       = 0x2;    alct_reg_list[0x2]  = sc_monthday     ; alct_reg_len[sc_monthday   ]    =   16;   //  read  
+    int sc_year           = 0x3;    alct_reg_list[0x3]  = sc_year         ; alct_reg_len[sc_year       ]    =   16;   //  read    0x5555
+    int sc_todd           = 0x4;    alct_reg_list[0x0]  = sc_todd         ; alct_reg_len[sc_todd       ]    =   16;   //  read    0xAAAA
+    int sc_teven          = 0x5;    alct_reg_list[0x0]  = sc_teven        ; alct_reg_len[sc_teven      ]    =   16;   //  read    
+    int sc_dsn_rd         = 0x6;    alct_reg_list[0x0]  = sc_dsn_rd       ; alct_reg_len[sc_dsn_rd     ]    =   10;   //  read    
+    int sc_dsn_wr         = 0x7;    alct_reg_list[0x4]  = sc_dsn_wr       ; alct_reg_len[sc_dsn_wr     ]    =   10;   //  write   
+    int sc_adc_rd         = 0x8;    alct_reg_list[0x5]  = sc_adc_rd       ; alct_reg_len[sc_adc_rd     ]    =   5;    //  read    
+    int sc_adc_wr         = 0x9;    alct_reg_list[0x6]  = sc_adc_wr       ; alct_reg_len[sc_adc_wr     ]    =   5;    //  write   
+    int sc_adb_hit_rd     = 0xa;    alct_reg_list[0x7]  = sc_adb_hit_rd   ; alct_reg_len[sc_adb_hit_rd ]    =   42;   //  write   
+    int sc_crc_err_rd     = 0xb;    alct_reg_list[0x8]  = sc_crc_err_rd   ; alct_reg_len[sc_crc_err_rd ]    =   1;    //  
+    int sc_adb_adr_rd     = 0x15;   alct_reg_list[0x9]  = sc_adb_adr_rd   ; alct_reg_len[sc_adb_adr_rd ]    =   9;    //  read    ADB connector channel readback
+    int sc_adb_adr_wr     = 0x16;   alct_reg_list[0xa]  = sc_adb_adr_wr   ; alct_reg_len[sc_adb_adr_wr ]    =   9;    //  write   ADB connector channel 0-41
+    int sc_adb_scsi_rd    = 0x17;   alct_reg_list[0xb]  = sc_adb_scsi_rd  ; alct_reg_len[sc_adb_scsi_rd]    =   16;   //  read    SCSI data readback
+    int sc_adb_scsi_wr    = 0x18;   alct_reg_list[0xc]  = sc_adb_scsi_wr  ; alct_reg_len[sc_adb_scsi_wr]    =   16;   //  write   SCSI data to write
+    int sc_adb_data_rd    = 0x19;   alct_reg_list[0xd]  = sc_adb_data_rd  ; alct_reg_len[sc_adb_data_rd]    =   16;   //  read    ADB data read back via delay ASIC and multiplexers
+    int sc_dly_rd         = 0x1A;   alct_reg_list[0xe]  = sc_dly_rd       ; alct_reg_len[sc_dly_rd     ]    =  120;   //  
+    int sc_dly_wr         = 0x1B;   alct_reg_list[0xf]  = sc_dly_wr       ; alct_reg_len[sc_dly_wr     ]    =  120;   //  
+    int sc_dly_sel_rd     = 0x1C;   alct_reg_list[0x10] = sc_dly_sel_rd   ; alct_reg_len[sc_dly_sel_rd ]    =   3;    //  
+    int sc_dly_sel_wr     = 0x1D;   alct_reg_list[0x11] = sc_dly_sel_wr   ; alct_reg_len[sc_dly_sel_wr ]    =   3;    //  
 
 //L900:
     printf("\tsc_bypass         = 0x0;   //  1;  \n") ;
@@ -7626,6 +7696,30 @@ alct_auto_done:
     printf("\tsc_dly_sel_rd     = 0x1C;  //  3;  \n") ;
     printf("\tsc_dly_sel_wr     = 0x1D;  //  3;  \n") ;
     printf("\t<cr>=exit \n");
+
+    // dump
+    int ireg=0; 
+    for (ireg=0; ireg<0x12; ireg=ireg+1) {
+
+        opcode = alct_reg_list[ireg]; 
+
+        // Switch to ALCT mez JTAG chain
+            adr     = boot_adr;                                     // Boot register address
+            ichain  = 0x02;                                         // ALCT Mezzanine user jtag chain
+            chip_id = 0;                                            // ALCT Mezzanine user jtag path has 1 chip
+
+            vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        // Read data at selected opcode
+            reg_len = alct_reg_len[opcode];                         // Register length
+
+            vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+            vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+
+            printf("\tOpcode=%2X Length=%3i rd=",opcode,alct_reg_len[opcode]);
+            if   (reg_len>0) {for (i=reg_len-1;i>=0;--i) printf("%1i",tdo[i]); printf("\n");}
+            else             printf("x\n");
+    }
 
     inquire("\tALCT mez JTAG register opcode <cr>=%2X ", 0, 0x1d, 16, opcode);
 
@@ -7815,7 +7909,7 @@ int L2100() {
     int err_cnt=0; 
 
     const int idlytst_max = 6; 
-    int idly_pattern [idlytst_max] = {0xffff,0x0000,0x5555,0xAAAA,0x6666,0x9999}; 
+    int idly_pattern [idlytst_max] = {0xffff,0x5555,0xAAAA,0x6666,0x9999,0x0000}; 
 
     int tpat; 
 
@@ -8452,8 +8546,8 @@ L23810:
     void ck(string msg_string, int data_read, int data_expect)
 {
     if (data_read != data_expect) {
-    fprintf(stdout,  "ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
-    fprintf(log_file,"ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
+    fprintf(stdout,  "\t\t> ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
+    fprintf(log_file,"\t\t> ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
 //  pause(" ");
     }
     return;
@@ -8468,8 +8562,8 @@ L23810:
     status = 0; // good return
     if (data_read != data_expect) {
     status = 1; // bad return
-    fprintf(stdout,  "\tERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
-    fprintf(log_file,"\tERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
+    fprintf(stdout,  "\t\t > ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
+    fprintf(log_file,"\t\t > ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
 //  pause(" ");
     }
 
@@ -8489,8 +8583,8 @@ L23810:
     status=0;
     if (abs(err)>tolerance) {
     status=1;
-    fprintf(stdout,  "\tERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
-    fprintf(log_file,"\tERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
+    fprintf(stdout,  "\t> ERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
+    fprintf(log_file,"\t> ERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
     }
 
     return;

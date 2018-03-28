@@ -45,7 +45,7 @@
 // Prototypes
 //------------------------------------------------------------------------------
 
-    int get_alct_fpga_type();
+    extern int alct_fpga_type; 
     long int    jtag_read   (unsigned long &adr, int &ichain, int &chip_id, int &opcode, int &reg_len, unsigned short &rd_data);
     long int    jtag_write  (unsigned long &adr, int &ichain, int &chip_id, int &opcode, int &reg_len, unsigned short &wr_data);
 
@@ -154,8 +154,6 @@
 
 // Convert ADC counts to voltages and currents
 
-    int alct_type=get_alct_fpga_type();
-
     unsigned char v3p3_mez_idx   = 0;
     unsigned char v2p5_mez_idx   = 0;
     unsigned char vcore_mez_idx  = 0;
@@ -171,7 +169,7 @@
     unsigned char vgbtx_rssi_idx = 0;
     unsigned char tgbtx_mez_idx  = 0;
 
-    if (alct_type==0x1506) // S-6 150
+    if (alct_fpga_type==0x1506) // S-6 150
     {
         v3p3_mez_idx  = 0;
         v2p5_mez_idx  = 1;
@@ -184,7 +182,7 @@
         vzero_mez_idx = 12;
         vref_mez_idx  = 13;
     }
-    else if (alct_type==0x1006) // S-6 100
+    else if (alct_fpga_type==0x1006) // S-6 100
     {
         v3p3_mez_idx   = 0;
         v2p5_mez_idx   = 1;
@@ -199,7 +197,7 @@
         vzero_mez_idx  = 12;
         vref_mez_idx   = 13;
     }
-    else if (alct_type==0x1516) // S-6 LX150T
+    else if (alct_fpga_type==0x1516) // S-6 LX150T
     {
         v3p3_mez_idx  = 0;
         v2p5_mez_idx  = 1;
@@ -223,17 +221,17 @@
     tfpga_mez = (adc_voltage_mez[tfpga_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV
 
 
-    if (alct_type==0x1506)
+    if (alct_fpga_type==0x1506)
     {
         tsink_mez = (adc_voltage_mez[tsink_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV
     }
-    else if (alct_type==0x1006)
+    else if (alct_fpga_type==0x1006)
     {
         vgbtx_rssi = adc_voltage_mez[vgbtx_rssi_idx]; // 1v/1v
         v1p5_mez   = adc_voltage_mez[v1p5_mez_idx]; // 1v/1v
         tgbtx_mez  = (adc_voltage_mez[tgbtx_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV
     }
-    else if (alct_type == 0x1516)
+    else if (alct_fpga_type == 0x1516)
     {
         v1p2_mgt  = adc_voltage_mez[v1p2_mgt_idx];              // 1v/1v
         tsink_mez = (adc_voltage_mez[tsink_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV

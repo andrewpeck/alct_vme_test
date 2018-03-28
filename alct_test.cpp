@@ -4250,6 +4250,8 @@ read_adc:
 // Store previous channel
     tdi_to_i4(&tdo[0],i4,reg_len,1);                        // SPI=1 for DACs | ADCs that take MSB first
 
+    i4 = i4&0x3ff; // 10 bit dac
+
     adc_ch = adc_adr-1;                                     // Data read at this adr is for previous channel
 
     if (adc_adr > 0) adc_data[iadc][adc_ch] = i4;
@@ -5571,7 +5573,8 @@ start_sctest:
     vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
 
     iadc = 2;                                               // Power supply adc
-    for (adc_adr=0; adc_adr<=15; ++adc_adr)                 // 11 channels + 3 internal channels (0-13) + 1 to read last ch
+
+    for (adc_adr=0; adc_adr<=13; adc_adr++)                 // 11 channels + 3 internal channels (0-13) + 1 to read last ch
     {
         adc_word = ((adc_adr%14) << 7);                         // adr 0 reads junk, adr 1-14 reads ch 0-13
         opcode  = 0x10+iadc;                                    // Opcode
@@ -5717,8 +5720,10 @@ start_sctest:
             vme_jtag_write_ir(adr,ichain,chip_id,opcode0);          // Deassert /CS + wait > 21us for previous conversion to complete
             tdi_to_i4(&tdo[0],i4,reg_len,1);                        // SPI=1 for DACs | ADCs that take MSB first
 
+            i4 = i4 & 0x3ff; // 10 bit adc
+
             adc_expect = double(dac_data) * 1024./256.;
-            adc_value[ithr][dac_data] = i4;
+            adc_value[ithr][dac_data] = i4; 
             adc_error[ithr][dac_data] = double(i4)-adc_expect;
 
             abs_err = abs(int(adc_error[ithr][dac_data]));
@@ -8752,12 +8757,6 @@ int iadc_for_adb (int adb, bool return_channel) {
         case 39: iadc=4; adc_ch=6;      break;
         case 40: iadc=4; adc_ch=7;      break;
         case 41: iadc=4; adc_ch=8;      break;
-    }
-
-    // compensate for the fact that the 288 and 384 have 3 ADCs instead
-    // of 5 but otherwise share the same mapping
-    if (alct_type==ALCT288 || alct_type==ALCT384) {
-        iadc = iadc-2;
     }
 
     if (return_channel)

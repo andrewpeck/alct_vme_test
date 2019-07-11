@@ -23,6 +23,7 @@
     extern double adc_voltage_mez[14];
     extern double v3p3_mez;
     extern double v2p5_mez;
+    extern double v2p5_sfp_mez;
     extern double vcore_mez;
     extern double v1p8_mez;
     extern double v1p2_mez;
@@ -39,7 +40,8 @@
     extern double vgbtx_rssi;
     extern double tgbtx_mez;
     extern double v1p2_mgt;
-    extern double v1p5_mez;
+    extern double v1p5d_mez;
+    extern double v1p5a_mez;
 
 //------------------------------------------------------------------------------
 // Prototypes
@@ -154,20 +156,22 @@
 
 // Convert ADC counts to voltages and currents
 
-    unsigned char v3p3_mez_idx   = 0;
-    unsigned char v2p5_mez_idx   = 0;
-    unsigned char vcore_mez_idx  = 0;
-    unsigned char v1p8_mez_idx   = 0;
-    unsigned char v1p2_mez_idx   = 0;
-    unsigned char v1p2_mgt_idx   = 0;
-    unsigned char v1p5_mez_idx   = 0;
-    unsigned char tfpga_mez_idx  = 0;
-    unsigned char tsink_mez_idx  = 0;
-    unsigned char vref2_mez_idx  = 0;
-    unsigned char vzero_mez_idx  = 0;
-    unsigned char vref_mez_idx   = 0;
-    unsigned char vgbtx_rssi_idx = 0;
-    unsigned char tgbtx_mez_idx  = 0;
+    unsigned char v3p3_mez_idx     = 0;
+    unsigned char v2p5_mez_idx     = 0;
+    unsigned char v2p5_sfp_mez_idx = 0;
+    unsigned char vcore_mez_idx    = 0;
+    unsigned char v1p8_mez_idx     = 0;
+    unsigned char v1p2_mez_idx     = 0;
+    unsigned char v1p2_mgt_idx     = 0;
+    unsigned char v1p5d_mez_idx    = 0;
+    unsigned char v1p5a_mez_idx    = 0;
+    unsigned char tfpga_mez_idx    = 0;
+    unsigned char tsink_mez_idx    = 0;
+    unsigned char vref2_mez_idx    = 0;
+    unsigned char vzero_mez_idx    = 0;
+    unsigned char vref_mez_idx     = 0;
+    unsigned char vgbtx_rssi_idx   = 0;
+    unsigned char tgbtx_mez_idx    = 0;
 
     if (alct_fpga_type==0x1506) // S-6 150
     {
@@ -184,18 +188,21 @@
     }
     else if (alct_fpga_type==0x1006) // S-6 100
     {
-        v3p3_mez_idx   = 0;
-        v2p5_mez_idx   = 1;
-        vcore_mez_idx  = 2;
-        v1p8_mez_idx   = 3;
-        v1p2_mez_idx   = 4;
-        vgbtx_rssi_idx = 5;
-        v1p5_mez_idx   = 6;
-        tfpga_mez_idx  = 7;
-        tgbtx_mez_idx  = 8;
-        vref2_mez_idx  = 11;
-        vzero_mez_idx  = 12;
-        vref_mez_idx   = 13;
+        // v2  design
+        v3p3_mez_idx     = 0;
+        v2p5_mez_idx     = 1;
+        vcore_mez_idx    = 2;
+        v1p8_mez_idx     = 3;
+        v1p2_mez_idx     = 4;
+        vgbtx_rssi_idx   = 5;
+        v1p5d_mez_idx    = 6;
+        v1p5a_mez_idx    = 7;
+        v2p5_sfp_mez_idx = 8;
+        tfpga_mez_idx    = 9;
+        tgbtx_mez_idx    = 10;
+        vref2_mez_idx    = 11;
+        vzero_mez_idx    = 12;
+        vref_mez_idx     = 13;
     }
     else if (alct_fpga_type==0x1516) // S-6 LX150T
     {
@@ -213,12 +220,13 @@
     }
 
 
-    v3p3_mez  =  adc_voltage_mez[v3p3_mez_idx]*2.0;         // 1v/2v
-    v2p5_mez  =  adc_voltage_mez[v2p5_mez_idx]*2.0;         // 1v/2v
-    vcore_mez =  adc_voltage_mez[vcore_mez_idx];            // 1v/1v
-    v1p8_mez  =  adc_voltage_mez[v1p8_mez_idx];             // 1v/1v
-    v1p2_mez  =  adc_voltage_mez[v1p2_mez_idx];             // 1v/1v
-    tfpga_mez = (adc_voltage_mez[tfpga_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV
+    v3p3_mez      =  adc_voltage_mez[v3p3_mez_idx]*2.0;     // 1v/2v
+    v2p5_mez      =  adc_voltage_mez[v2p5_mez_idx]*2.0;     // 1v/2v
+    v2p5_sfp_mez  =  adc_voltage_mez[v2p5_sfp_mez_idx]*2.0; // 1v/2v
+    vcore_mez     =  adc_voltage_mez[vcore_mez_idx];            // 1v/1v
+    v1p8_mez      =  adc_voltage_mez[v1p8_mez_idx];             // 1v/1v
+    v1p2_mez      =  adc_voltage_mez[v1p2_mez_idx];             // 1v/1v
+    tfpga_mez     = (adc_voltage_mez[tfpga_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV
 
 
     if (alct_fpga_type==0x1506)
@@ -228,7 +236,8 @@
     else if (alct_fpga_type==0x1006)
     {
         vgbtx_rssi = adc_voltage_mez[vgbtx_rssi_idx]; // 1v/1v
-        v1p5_mez   = adc_voltage_mez[v1p5_mez_idx]; // 1v/1v
+        v1p5d_mez   = adc_voltage_mez[v1p5d_mez_idx]; // 1v/1v
+        v1p5a_mez   = adc_voltage_mez[v1p5a_mez_idx]; // 1v/1v
         tgbtx_mez  = (adc_voltage_mez[tgbtx_mez_idx]-0.5)*100.0; // 10mv/C+500mV 25C=750mV
     }
     else if (alct_fpga_type == 0x1516)

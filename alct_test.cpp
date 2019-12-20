@@ -63,6 +63,28 @@
 //
 //  Others  bypass          1       Pass  tdi --> tdo
 //
+
+    #define n_D4 294
+    #define n_E4 329
+    #define n_F4 349
+    #define n_G4 392
+    #define n_G4 392
+    #define n_A4 440
+	#define n_B4 494
+	#define n_C5 523
+	#define n_D5 587
+	#define n_E5 659
+	#define n_F5 698
+	#define n_G5 784
+	#define n_A5 880
+	#define n_B5 988
+	#define n_C6 1047
+	#define n_D6 1175
+	#define n_E6 1319
+	#define n_F6 1397
+	#define n_G6 1568
+	#define n_A6 1760
+
 //------------------------------------------------------------------------------
 //  Headers
 //------------------------------------------------------------------------------
@@ -70,6 +92,7 @@
 
     #include <stdio.h>
     #include <time.h>
+    #include <stdlib.h>
     #include <windows.h>
     #include <math.h>
     #include <conio.h>
@@ -103,6 +126,9 @@
     inline int mxadbs() {return alct_type==ALCT288 ? 18 : alct_type==ALCT384 ? 24 : alct_type==ALCT672 ? 42 : -1;} // Number of AFEBs;
     inline int mxadcs() {return alct_type==ALCT288 ?  3 : alct_type==ALCT384 ?  3 : alct_type==ALCT672 ?  5 : -1;} // Number of DACs
     inline int mxdacs() {return mxadcs()-1;}                                                                       // number of dacs always equal to number of adcs-1
+
+    void            sam_song (); 
+    void            turkey_in_the_straw(); 
 
 // Common/decode_readout_common/
     int             scp_tbins;
@@ -158,12 +184,14 @@
     double          adc_voltage_mez[14];
     double          v3p3_mez;
     double          v2p5_mez;
+    double          v2p5_sfp_mez;
     double          vcore_mez;
     double          vgbtx_rssi;
     double          v1p8_mez;
     double          v1p2_mez;
     double          v1p2_mgt;
-    double          v1p5_mez;
+    double          v1p5d_mez;
+    double          v1p5a_mez;
     double          tfpga_mez;
     double          tsink_mez;
     double          tgbtx_mez;
@@ -1845,14 +1873,18 @@
     double          tfpga_mez_f;
     double          tsink_mez_f;
     double          tgbtx_mez_f;
+    double          i_rssi;
 
     std::vector<double> voltages;
     std::vector<double> temperatures;
+    std::vector<double> currents;
     std::vector<int>    adc_errs;
     std::vector<int>    voltages_errs;
+    std::vector<int>    currents_errs;
     std::vector<int>    temperatures_errs;
     std::vector<std::string>    voltages_text;
     std::vector<std::string>    temperatures_text;
+    std::vector<std::string>    currents_text;
 
 
     int err_last; 
@@ -2022,6 +2054,7 @@
     char            dash1[2]={'-','1'};
     char            passfail[2]={'P','F'};
     bool            sc_version_new;
+    bool            sc_version_2014;
     bool            sc_version_old;
 
     int             bxn_offset_pretrig;
@@ -2054,6 +2087,9 @@
 //------------------------------------------------------------------------------
     int main()
 {
+
+    //turkey_in_the_straw(); 
+
 //------------------------------------------------------------------------------
 //  Debug print mode
 //------------------------------------------------------------------------------
@@ -2750,8 +2786,10 @@ L10610:
     }
     else if (alct_fpga_type==0x1006)
     {
-    fprintf(stdout,"\t+1.5   VccGBT   %6.3f V\n",v1p5_mez);
-    fprintf(stdout,"\t+VRSSI          %6.3f V\n",vgbtx_rssi);
+    fprintf(stdout,"\t+2.5   VccSFP   %6.3f V\n",v2p5_sfp_mez);
+    fprintf(stdout,"\t+1.5d  VccGBT   %6.3f V\n",v1p5d_mez);
+    fprintf(stdout,"\t+1.5a  VccGBT   %6.3f V\n",v1p5a_mez);
+    fprintf(stdout,"\t+RSS_I          %6.3f mA\n",i_rssi);
     fprintf(stdout,"\t+Tgbtx          %6.3f C  %5.1f F\n",tgbtx_mez,(32.+tgbtx_mez*9./5.));
     }
     else if (alct_fpga_type == 0x1516)
@@ -3453,11 +3491,24 @@ next_adb:
     {
     adb_passed[adb_wr_ch]=!ifail;
 
-    Beep(784,250);  // G
-    Beep(440,250);  // A
-    Beep(698,250);  // F
-    Beep(349,250);  // F octave lower
-    Beep(523,250);  // C
+    //Beep(784,250);  // G
+    //Beep(440,250);  // A
+    //Beep(698,250);  // F
+    //Beep(349,250);  // F octave lower
+    //Beep(523,250);  // C
+    //_sleep(1000);
+    //Beep(523,250);  // C
+    
+    // don't update here for automatic s6 single cable test
+    //
+    Beep(n_D4,50);
+    _sleep(25);
+    Beep(n_D4,50);
+    _sleep(25);
+    Beep(n_D5,75);
+    _sleep(75);
+    Beep(n_A4,75);
+
 
 // Next ADB
     adb_wr_ch++;
@@ -5193,7 +5244,7 @@ vga_done:
 
     alct_fpga_type = get_alct_fpga_type(); 
 
-    alct_board_id = 880;
+    alct_board_id = 801;
 
     i = alct_board_id;  inquire("\tEnter ALCT Base Board ID Number 800-880   [%4i] ",  800,  880,  10, i); alct_board_id = i;
     if (alct_fpga_type==0x1506) {// S-6 150 
@@ -5201,12 +5252,12 @@ vga_done:
     i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 2000-2200 [%4i] ", 2000, 2200,  10, i); mez_board_id  = i;
     }
     else if (alct_fpga_type==0x1006) {
-    mez_board_id  = 10000;
-    i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 10000-10320 [%4i] ", 10000, 10320,  10, i); mez_board_id  = i;
+    mez_board_id  = 3000;
+    i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 3000-3323 [%4i] ", 3000, 3323,  10, i); mez_board_id  = i;
     }
     else if (alct_fpga_type==0x1516) {
-    mez_board_id  = 15000;
-    i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 15000-15120 [%4i] ", 15000, 15120,  10, i); mez_board_id  = i;
+    mez_board_id  = 4000;
+    i = mez_board_id;   inquire("\tEnter Mezzanine Board ID Number 4000-4122 [%4i] ", 4000, 4122,  10, i); mez_board_id  = i;
     }
 
     sprintf(calct_board_id,"%3.3i",alct_board_id);
@@ -5431,25 +5482,28 @@ start_sctest:
 
     adc_read_alct(adr,ichain,chip_id,opcode_rd,opcode_wr,reg_len);
 
-    // TODO: convert RSSI into a current
     tfpga_mez_f = (32.+tfpga_mez*9./5.);
     tsink_mez_f = (32.+tsink_mez*9./5.);
     tgbtx_mez_f = (32.+tgbtx_mez*9./5.);
+    i_rssi = (v2p5_mez - vgbtx_rssi) / 1000. * 1000.;  // mA
 
     adc_errs.clear();
 
     voltages.clear();
     temperatures.clear();
+    currents.clear();
 
     voltages_errs.clear();
     temperatures_errs.clear();
+    currents_errs.clear();
 
     voltages_text.clear();
     temperatures_text.clear();
+    currents_text.clear();
 
-    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v3p3_mez)  ; voltages_text.push_back("+3.3    Vcc    ") ;
+    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .15,   err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v3p3_mez)  ; voltages_text.push_back("+3.3    Vcc    ") ;
     tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v2p5_mez)  ; voltages_text.push_back("+2.5    Vccaux ") ;
-    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0250, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(vcore_mez) ; voltages_text.push_back("+1.8    Vcore  ") ;
+    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0500, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(vcore_mez) ; voltages_text.push_back("+1.8    Vcore  ") ;
     tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p8_mez)  ; voltages_text.push_back("+1.8    Vccprom") ;
     tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last) ; voltages_errs.push_back (err_last) ; voltages.push_back(v1p2_mez)  ; voltages_text.push_back("+1.2    Vccint ") ;
 
@@ -5460,16 +5514,18 @@ start_sctest:
     }
     else if (alct_fpga_type==0x1006)
     {
-    tok("+1.5V     S6 Mez ", v1p5_mez ,    1.500, 0.0250,  err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5_mez)            ;     voltages_text.push_back("+1.5    VCCGBT ");
-    tok("RSSI      S6 Mez ", vgbtx_rssi,   0.20,  0.10,    err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vgbtx_rssi)          ;     voltages_text.push_back("+1.2    VRSSI  ");
-    tok("Tgbtx     S6 Mez ", tgbtx_mez_f,  90.00, 0.2000,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez)       ; temperatures_text.push_back("+Temp   TGBTX  ");
-    tok("Tfpga     S6 Mez ", tfpga_mez_f , 90.00 , 0.200,  err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)     ; temperatures_text.push_back("+Temp   TFpga  ");
+    tok("+2.5V SFP S6 Mez ", v2p5_sfp_mez, 2.500, 0.0250, err_last) ; voltages_errs.push_back (err_last)    ; voltages.push_back(v2p5_sfp_mez)    ; voltages_text.push_back("+2.5    VccSFP ") ;
+    tok("+1.5Vd    S6 Mez ", v1p5d_mez ,   1.500, 0.0250, err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5d_mez)       ; voltages_text.push_back("+1.5    VCCGBT ");
+    tok("+1.5Va    S6 Mez ", v1p5a_mez ,   1.500, 0.0250, err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p5a_mez)       ; voltages_text.push_back("+1.5    VCCGBT ");
+    tok("RSSI      S6 Mez ", i_rssi     ,  0.60,  0.3000, err_last) ; currents_errs.push_back(err_last)     ; currents.push_back(i_rssi)          ; currents_text.push_back("RSSI Current   ");
+    tok("Tgbtx     S6 Mez ", tgbtx_mez_f,  90.00, 0.2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tgbtx_mez)   ; temperatures_text.push_back("+Temp   TGBTX  ");
+    tok("Tfpga     S6 Mez ", tfpga_mez_f , 90.00, 0.2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f) ; temperatures_text.push_back("+Temp   TFpga  ");
     }
     else if (alct_fpga_type==0x1516)
     {
-    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(vcore_mez  )     ;     voltages_text.push_back  ("+1.2    Vccint ");
-    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back  ("+Temp   TSink  ");
-    tok("Tfpga     S6 Mez ", tfpga_mez_f , 72.00 , .2000, err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)    ; temperatures_text.push_back  ("+Temp   TFpga  ");
+    tok("+1.2V MGT S6 Mez ", v1p2_mgt    , 1.200 , 0.0250 , err_last) ; voltages_errs.push_back(err_last)     ; voltages.push_back(v1p2_mgt  )     ;     voltages_text.push_back  ("+1.2    Vccint ");
+    tok("Tsink     S6 Mez ", tsink_mez_f , 90.00 , 0.2000 , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tsink_mez_f) ; temperatures_text.push_back  ("+Temp   TSink  ");
+    tok("Tfpga     S6 Mez ", tfpga_mez_f , 90.00 , 0.2000 , err_last) ; temperatures_errs.push_back(err_last) ; temperatures.push_back(tfpga_mez_f)    ; temperatures_text.push_back  ("+Temp   TFpga  ");
     }
 
     tok("+vref/2   S6 Mez ", vref2_mez   , 1.250,  .0010, err_last) ;     voltages_errs.push_back(err_last) ;     voltages.push_back(  vref2_mez)    ;     voltages_text.push_back  ("+vref/2 1.25V  ");
@@ -5480,6 +5536,13 @@ start_sctest:
     for (i=0; i<int(voltages.size()); i++) {
         fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f V     %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
         fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f V     %s\n",itest,voltages_text[i].c_str(), voltages[i], spass_fail[voltages_errs[i]].c_str());
+        itest++;
+    }
+
+    if (currents.size()>0)
+    for (i=0; i<int(currents.size()); i++) {
+        fprintf(stdout,    "\t%2i Spartan6 ADC %s  %12.3f mA    %s\n",itest,currents_text[i].c_str(), currents[i], spass_fail[currents_errs[i]].c_str());
+        fprintf(test_file, "\t%2i Spartan6 ADC %s  %12.3f mA    %s\n",itest,currents_text[i].c_str(), currents[i], spass_fail[currents_errs[i]].c_str());
         itest++;
     }
 
@@ -5494,6 +5557,12 @@ start_sctest:
     {
         if (voltages_errs[i]==0) alct_npassed[itest+i]=1;
         else                     alct_nfailed[itest+i]=1;
+    }
+
+    for (i=0; i<int(currents_errs.size()); ++i)
+    {
+        if (currents_errs[i]==0) alct_npassed[itest+i]=1;
+        else                         alct_nfailed[itest+i]=1;
     }
 
     for (i=0; i<int(temperatures_errs.size()); ++i)
@@ -5588,7 +5657,14 @@ start_sctest:
         (sc_id_version  == 0xA)     &&
         (sc_id_chip     == 0x6));
 
-    if (sc_version_new || sc_version_old ) {
+    int sc_version_new_new = (
+        (sc_id_month    == 0x02)    &&
+        (sc_id_day      == 0x20)    &&
+        (sc_id_year     == 0x2014)  &&
+        (sc_id_version  == 0xB)     &&
+        (sc_id_chip     == 0x8));
+
+    if (sc_version_new || sc_version_old || sc_version_new_new ) {
            alct_npassed[itest]=1; ipf=0;
     }
     else  {
@@ -5667,11 +5743,24 @@ start_sctest:
         // printf("\tADC channel %1X  %4i  %s  %5.3fV %6.3f%s\n", adc_ch, adc_data[iadc][adc_ch], adc_ch_name[iadc][adc_ch].c_str(), vadc, vadc_scaled, adc_ch_unit[iadc][adc_ch].c_str());
     }   // close adc_ch
 
-    double i3v3_expect = (1.5/24.0 * mxadbs()) + ((alct_fpga_type==0x1006) ? 0.5 : 0); 
+    // lx150 and lx150t have extra 1p8v and 3p3v current
+    double i3v3_expect = 0; 
+    if (alct_fpga_type==0x1006) {
+        i3v3_expect = (1.5/24.0 * mxadbs()) + 1.3; 
+    }
+    else if (alct_fpga_type==0x1516) {
+        i3v3_expect = 3.15; 
+    }
+    else {
+        i3v3_expect = (1.5/24.0 * mxadbs());
+    }
+
+    double i1v8_expect = 0.1077 + ((alct_fpga_type==0x1516) ? 0.5 : 0);
 
     for (i=0; i<=13; ++i) adc_err_base[i]=0;
 
-    tok("ADC Ch2 +1.8A  ", vadc_base[iadc][ 2],    0.1077,      .4000,     adc_err_base[ 2]);
+    
+    tok("ADC Ch2 +1.8A  ", vadc_base[iadc][ 2],    i1v8_expect, .4000,     adc_err_base[ 2]);
     tok("ADC Ch3 +3.3A  ", vadc_base[iadc][ 3],    i3v3_expect, .2500,     adc_err_base[ 3]);
     if (alct_board_id==801)   adc_err_base[3]=0;  // 3.3A circuit is broken on board 801, skip it for now
 //  tok("ADC Ch4 +5.5A1 ", vadc_base[iadc][ 4],    0.085,       .5000,     adc_err_base[ 4]);  // These are too small to read reliably
@@ -5970,6 +6059,20 @@ adb_data_loop_sc:
 
                 if (sok=="OK")  alct_npassed_sc[itest_sc]++;
                 if (sok=="ERR") {printf("\n");
+                    //temp
+                            opcode  = 0x0A;                                         // ALCT opcode
+                            reg_len = mxadbs();                                       // Register length
+
+                            vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+                            vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write 0's read tdo
+
+                            tdi_to_i4(&tdo[0],adb_hit,reg_len,0);
+
+                            adb_hit_expect = UINT64(1)<<adb_wr_ch;
+
+                            printf("\tADB=%2i test=%1i pass=%2i sent=0x%4.4X received=0x%4.4X ADBlist=%011llx expected=%011llx\n",
+                            adb_wr_ch, itest, ipass, scsi_wr_data, adb_rd_data, adb_hit, adb_hit_expect);
+                    //temp
                     printf("\tADB=%2i Cable read data %4.4X   %s\n",adb_wr_ch,adb_rd_data,sok.c_str());
                     printf("\tADB=%2i Expected        %4.4X     \n",adb_wr_ch,scsi_wr_data);
                     printf("\tADB cable read data error: skip|retry|exit [r]");
@@ -5993,8 +6096,10 @@ adb_hit_loop_sc:                                            // Read ADB hit list
                 else if ((adb_hit==0) && (scsi_wr_data==0)) sok="OK";   // Unless the tx data is 0
                 else                                        sok="ERR";  // Otherwise fail
 
+                //if (ipattern=npatterns-1) {
                 printf("\tADB=%2i test=%1i pass=%2i tx=0x%4.4X rx=0x%4.4X adblist=%011llx expect=%011llx\r",
                         adb_wr_ch, itest_sc, ipass, scsi_wr_data, adb_rd_data, adb_hit, adb_hit_expect);
+                //}
 
                 if (sok=="OK")  alct_npassed_sc[itest]++;
                 if (sok=="ERR") {printf("\n");
@@ -6029,11 +6134,22 @@ adb_hit_loop_sc:                                            // Read ADB hit list
 next_adb_sc:                                // Automatic ADB increment
     if(ipf==0) adb_passed[adb_wr_ch]=true;
 
-    Beep(784,250);  // G
-    Beep(440,250);  // A
-    Beep(698,250);  // F
-    Beep(349,250);  // F octave lower
-    Beep(523,250);  // C
+    //Beep(784,250);  // G
+    //Beep(440,250);  // A
+    //Beep(698,250);  // F
+    //Beep(349,250);  // F octave lower
+    //Beep(523,250);  // C
+    //_sleep(2000);
+    //Beep(1046,125);  // 
+
+    // update here for single cable test
+    Beep(n_D4,125);
+    _sleep(25);
+    Beep(n_D4,125);
+    _sleep(25);
+    Beep(n_D5,200);
+    _sleep(50);
+    Beep(n_A4,200);
 
     adb_wr_ch++;                            // Next ADB
     if (adb_wr_ch>=mxadbs()) goto alct_sc_done;
@@ -6041,10 +6157,10 @@ next_adb_sc:                                // Automatic ADB increment
     printf("\n");
 na: printf("\tCR to advance to ADB channel %2i connector %2i or skip|exit|lbtest [cr]",adb_wr_ch,adb_wr_ch+1);
     gets(line);
-    if (line[0]==NULL)                {itest++; goto adb_loop_sc;}
-    if (line[0]=='E' || line[0]=='e') goto alct_auto_done;
-    if (line[0]=='L' || line[0]=='l') {for (i=itest;i<=sc_itest_finish;++i) alct_nskipped[itest]=1; goto start_lbtest;}
-    if (line[0]=='S' || line[0]=='s')
+    if (line[0]==NULL || line[0]=='y') {itest++; goto adb_loop_sc;}
+    if (line[0]=='E'  || line[0]=='e') goto alct_auto_done;
+    if (line[0]=='L'  || line[0]=='l') {for (i=itest;i<=sc_itest_finish;++i) alct_nskipped[itest]=1; goto start_lbtest;}
+    if (line[0]=='S'  || line[0]=='s')
     {
         alct_nskipped[itest]=1;
         adb_wr_ch++;
@@ -6054,6 +6170,10 @@ na: printf("\tCR to advance to ADB channel %2i connector %2i or skip|exit|lbtest
         }
         goto alct_sc_done;
     }
+    else  {
+        goto na;
+    }
+
 alct_sc_done:
     npasses   = 1;                          // Done, clean up for next run
     adb_wr_ch = 0;
@@ -6102,7 +6222,7 @@ skip_lb:
 
     itest++; 
     int lbtest_start=itest; 
-    int lbtest_max = itest + 4; 
+    int lbtest_max = itest + 5; 
 
     for (itest=lbtest_start; itest<=lbtest_max; ++itest) alct_nskipped[itest]=1;
     goto alct_auto_done;
@@ -6110,12 +6230,81 @@ skip_lb:
 // Test 102: Hard reset ALCT then read Spartan-6 and Slow control firmware versions to check for automatic PROM load
 run_lbtest:
 
-    status  = vme_read(boot_adr,rd_data);                   // Get current boot reg
-    wr_data = rd_data | 0x0100;                             // Hard reset ALCT to check that FPGAs load from PROMs automatically
-    status  = vme_write(boot_adr,wr_data);                  // Assert   ALCT hard reset
+    int i_reset; 
+    for (i_reset=0; i_reset < 25; i_reset++) {
 
-    wr_data = rd_data & ~0x0100;                            // Turn off ACLT hard reset
-    status  = vme_write(boot_adr,wr_data);                  // Restore boot reg
+        ipf = 0;
+
+
+        status  = vme_read(boot_adr,rd_data);                   // Get current boot reg
+        wr_data = rd_data | 0x0100;                             // Hard reset ALCT to check that FPGAs load from PROMs automatically
+        status  = vme_write(boot_adr,wr_data);                  // Assert   ALCT hard reset
+
+        wr_data = rd_data & ~0x0100;                            // Turn off ACLT hard reset
+        status  = vme_write(boot_adr,wr_data);                  // Restore boot reg
+
+        sleep(400);                                             // Wait for ALCT to reload
+
+        adr     = boot_adr;                                     // Boot register address
+        ichain  = 0x00;                                         // ALCT Mezzanine control user jtag chain
+        chip_id = 0;                                            // ALCT slow control user jtag path has 1 chips
+        vme_jtag_anystate_to_rti(adr,ichain);                   // Take TAP to RTI
+
+        opcode  = 0x00;                                         // Opcode
+        reg_len = 40;                                           // Register length
+
+        for (i=0; i<reg_len; ++i) tdi[i]=0;                     // Clear tdi
+
+        vme_jtag_write_ir(adr,ichain,chip_id,opcode);           // Set opcode
+        vme_jtag_write_dr(adr,ichain,chip_id,tdi,tdo,reg_len);  // Write tdi, read tdo
+        tdi_to_i4(&tdo[ 0],sc_id_reg[0],32,0);
+        tdi_to_i4(&tdo[32],sc_id_reg[1], 8,0);
+
+        tdi_to_i4(&tdo[ 0], sc_id_chip,     4, 0);
+        tdi_to_i4(&tdo[ 4], sc_id_version,  4, 0);
+        tdi_to_i4(&tdo[ 8], sc_id_year,    16, 0);
+        tdi_to_i4(&tdo[24], sc_id_day,      8, 0);
+        tdi_to_i4(&tdo[32], sc_id_month,    8, 0);
+
+        sc_version_old = (
+            (sc_id_month    == 0x09)    &&
+            (sc_id_day      == 0x07)    &&
+            (sc_id_year     == 0x2001)  &&
+            (sc_id_version  == 0xB)     &&
+            (sc_id_chip     == 0x8));
+
+        sc_version_new= (
+            (sc_id_month    == 0x11)    &&
+            (sc_id_day      == 0x28)    &&
+            (sc_id_year     == 0x2012)  &&
+            (sc_id_version  == 0xA)     &&
+            (sc_id_chip     == 0x6));
+
+        sc_version_2014 = (
+            (sc_id_month    == 0x02)    &&
+            (sc_id_day      == 0x20)    &&
+            (sc_id_year     == 0x2014)  &&
+            (sc_id_version  == 0xB)     &&
+            (sc_id_chip     == 0x8));
+
+        if      (sc_version_new)    {alct_npassed[itest] =1; ipf|=0;}
+        else if (sc_version_old)    {alct_npassed[itest] =1; ipf|=0;} 
+        else if (sc_version_2014)   {alct_npassed[itest] =1; ipf|=0;} // Require 2014 firmware
+        else                        {alct_nfailed[itest]|=1; ipf|=1;}
+
+        if (ipf==0) {
+            printf("\tHard Reset #%d Pass\n", i_reset );
+        }
+        else {
+            printf("\tCR to advance to next hard reset");
+            gets(line);
+        }
+        if (line[0]==NULL || line[0]=='y') {continue;}
+
+    }
+
+    itest++;
+
     sleep(1000);                                            // Wait for ALCT to reload
 
     adr     = boot_adr;                                     // Boot register address
@@ -6153,18 +6342,20 @@ run_lbtest:
         (sc_id_version  == 0xA)     &&
         (sc_id_chip     == 0x6));
 
-    if (alct_board_id==801)
-    {
-    if (sc_version_new) {alct_npassed[itest]=1; ipf=0;}
-    else                {alct_nfailed[itest]=1; ipf=1;}
-    }
+    sc_version_2014 = (
+        (sc_id_month    == 0x02)    &&
+        (sc_id_day      == 0x20)    &&
+        (sc_id_year     == 0x2014)  &&
+        (sc_id_version  == 0xB)     &&
+        (sc_id_chip     == 0x8));
 
-    if (alct_board_id!=801)
-    {
-    if (sc_version_old) {alct_npassed[itest]=1; ipf=0;} // Require old, beco new firmware has bugs so we don't send it to CERN
-    else                {alct_nfailed[itest]=1; ipf=1;}
-    }
+    itest++; 
 
+    if      (sc_version_new)    {alct_npassed[itest]=1; ipf=0;}
+    else if (sc_version_old)    {alct_nfailed[itest]=1; ipf=1;} 
+    else if (sc_version_2014)   {alct_npassed[itest]=1; ipf=0;} // Require 2014 firmware
+    else                        {alct_nfailed[itest]=1; ipf=1;}
+    
     fprintf(stdout, "\t%2i Slow Control firmware  %2.2X/%2.2X/%4.4X  ver=%1X chip=%1X  %s\n",itest,sc_id_month,sc_id_day,sc_id_year,sc_id_version,sc_id_chip,spass_fail[ipf].c_str());
     fprintf(test_file,"%2i Slow Control firmware  %2.2X/%2.2X/%4.4X  ver=%1X chip=%1X  %s\n",itest,sc_id_month,sc_id_day,sc_id_year,sc_id_version,sc_id_chip,spass_fail[ipf].c_str());
 
@@ -6200,9 +6391,25 @@ run_lbtest:
     tdi_to_i4(&rsa[31], rsa_day,      5,0);
     tdi_to_i4(&rsa[36], rsa_month,    4,0);
 
-    if ((rsa_month ==  1)    &&
+    itest++; 
+
+    if (
+            
+        (
+        (rsa_month ==  1)    &&
         (rsa_day   == 18)    &&
-        (rsa_year  == 2013)) {alct_npassed[itest]=1; ipf=0;}
+        (rsa_year  == 2013)
+        )
+
+        || 
+
+        (
+        (rsa_month == 7)    &&
+        (rsa_day   == 3)    &&
+        (rsa_year  == 2019)
+        )
+        
+    ) {alct_npassed[itest]=1; ipf=0;}
     else                     {alct_nfailed[itest]=1; ipf=1;}
 
     fprintf(stdout, "\t%2i ALCT Firmware  Date %2.2i/%2.2i/%4.4i ver=%1X %s %s\n",itest,rsa_month,rsa_day,rsa_year,rsa_ver,spaces[11].c_str(),spass_fail[ipf].c_str());
@@ -6223,82 +6430,93 @@ run_lbtest:
 //  Test ??: Spartan-6 mezzanine ADC
 //------------------------------------------------------------------------------
 //
-    itest++; 
-
-    ichain    = 0x2;        // ALCT Mezzanine control jtag chain
-    adr       = boot_adr;   // Boot register address
-    chip_id   = 0;          // ALCT user path has 1 chip
-
-    opcode_rd = 0x08;       // ALCT mez ADC read  opcode
-    opcode_wr = 0x09;       // ALCT mez ADC write opcode
-    reg_len   = 5;          // Data register length
-
-    adc_read_alct(adr,ichain,chip_id,opcode_rd,opcode_wr,reg_len);
-
-    // TODO: convert RSSI into a current
-    tfpga_mez_f = (32.+tfpga_mez*9./5.);
-    tsink_mez_f = (32.+tsink_mez*9./5.);
-    tgbtx_mez_f = (32.+tgbtx_mez*9./5.);
-
-    voltages.clear();
-    temperatures.clear();
-    adc_errs.clear();
-
-    int err_last;
-
-    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last); adc_errs.push_back (err_last); voltages.push_back(v3p3_mez);
-    tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last); adc_errs.push_back (err_last); voltages.push_back(v2p5_mez);
-    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0250, err_last); adc_errs.push_back (err_last); voltages.push_back(vcore_mez);
-    tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last); adc_errs.push_back (err_last); voltages.push_back(v1p8_mez);
-    tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last); adc_errs.push_back (err_last); voltages.push_back(v1p2_mez);
-
-    if (alct_fpga_type==0x1506) // S-6 150
-    {
-    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); adc_errs.push_back(err_last); temperatures.push_back(tsink_mez_f);
-    }
-    else if (alct_fpga_type==0x1006)
-    {
-    tok("+1.5V     S6 Mez ", v1p5_mez ,  1.500, 0.0250,  err_last); adc_errs.push_back(err_last); voltages.push_back(v1p5_mez);
-    tok("RSSI      S6 Mez ", vgbtx_rssi, 0.20,  0.1,     err_last); adc_errs.push_back(err_last); voltages.push_back(vgbtx_rssi);
-    tok("Tgbtx     S6 Mez ", tgbtx_mez,  90.00, 0.2000,  err_last); adc_errs.push_back(err_last); temperatures.push_back(tgbtx_mez);
-    }
-    else if (alct_fpga_type==0x1516)
-    {
-    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last); adc_errs.push_back(err_last); voltages.push_back(vcore_mez  );
-    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last); adc_errs.push_back(err_last); voltages.push_back(tsink_mez_f);
-    }
-
-    tok("Tfpga     S6 Mez " , tfpga_mez_f , 72.00 , .2000  , err_last); adc_errs.push_back(err_last); voltages.push_back(tfpga_mez_f);
-
-    tok("+vref/2 S6 Mez ", vref2_mez,   1.250,       .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vref2_mez);
-    tok("+vzero  S6 Mez ", vzero_mez,   0.0,         .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vzero_mez);
-    tok("+vref   S6 Mez ", vref_mez,    2.499,       .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vref_mez );
-
-    ipf=0;
-	if (adc_errs.size() > 0 ) 
-    for (i=0; i<int(adc_errs.size()); ++i)
-        if (adc_errs[i]!=0) ipf=1;
-
-    if (ipf==0) alct_npassed[itest]=1;
-    else        alct_nfailed[itest]=1;
-
-    // fprintf(stdout, "\t%2i Spartan6 ADC");
-    // for (i=0; i<int(voltages.size()); ++i)
-    //     fprintf(stdout, " %3.1fV", voltages[i]);
-    // fprintf(stdout, "\n"); 
-
-    for (i=0; i<int(temperatures.size()); ++i)
-        fprintf(stdout, " %3.0fF", temperatures[i]);
-    fprintf(stdout, "\n"); 
-
-    fprintf(test_file, "\t%2i Spartan6 ADC");
-    for (i=0; i<int(voltages.size()); ++i)
-        fprintf(test_file, " %3.1fV", voltages[i]);
-    fprintf(stdout, "\n"); 
-
-    for (i=0; i<int(temperatures.size()); ++i)
-        fprintf(test_file, " %3.0fF", temperatures[i]);
-    fprintf(stdout, "\n"); 
+//    itest++; 
+//
+//    ichain    = 0x2;        // ALCT Mezzanine control jtag chain
+//    adr       = boot_adr;   // Boot register address
+//    chip_id   = 0;          // ALCT user path has 1 chip
+//
+//    opcode_rd = 0x08;       // ALCT mez ADC read  opcode
+//    opcode_wr = 0x09;       // ALCT mez ADC write opcode
+//    reg_len   = 5;          // Data register length
+//
+//    adc_read_alct(adr,ichain,chip_id,opcode_rd,opcode_wr,reg_len);
+//
+//    tfpga_mez_f = (32.+tfpga_mez*9./5.);
+//    tsink_mez_f = (32.+tsink_mez*9./5.);
+//    tgbtx_mez_f = (32.+tgbtx_mez*9./5.);
+//    i_rssi = (v2p5_mez - vgbtx_rssi) / 1000. * 1000; 
+//
+//    voltages.clear();
+//    temperatures.clear();
+//    currents.clear();
+//    adc_errs.clear();
+//
+//    int err_last;
+//
+//    tok("+3.3V     S6 Mez ", v3p3_mez,  3.260, .0250, err_last); adc_errs.push_back (err_last); voltages.push_back(v3p3_mez);
+//    tok("+2.5V     S6 Mez ", v2p5_mez,  2.500, .0250, err_last); adc_errs.push_back (err_last); voltages.push_back(v2p5_mez);
+//    tok("+VCORE    S6 Mez ", vcore_mez, 1.800, .0500, err_last); adc_errs.push_back (err_last); voltages.push_back(vcore_mez);
+//    tok("+1.8V     S6 Mez ", v1p8_mez,  1.800, .0200, err_last); adc_errs.push_back (err_last); voltages.push_back(v1p8_mez);
+//    tok("+1.2V     S6 Mez ", v1p2_mez,  1.200, .0200, err_last); adc_errs.push_back (err_last); voltages.push_back(v1p2_mez);
+//
+//    if (alct_fpga_type==0x1506) // S-6 150
+//    {
+//    tok("Tsink     S6 Mez ", tsink_mez_f, 72.00, .2000, err_last); adc_errs.push_back(err_last); temperatures.push_back(tsink_mez_f);
+//    }
+//    else if (alct_fpga_type==0x1006)
+//    {
+//    tok("+2.5V SFP S6 Mez ", v2p5_sfp_mez,  2.500, .0250, err_last); adc_errs.push_back (err_last); voltages.push_back(v2p5_sfp_mez);
+//    tok("+1.5Vd    S6 Mez ", v1p5d_mez ,  1.500, 0.0250,  err_last); adc_errs.push_back(err_last); voltages.push_back(v1p5d_mez);
+//    tok("+1.5Va    S6 Mez ", v1p5a_mez ,  1.500, 0.0250,  err_last); adc_errs.push_back(err_last); voltages.push_back(v1p5a_mez);
+//    tok("RSSI      S6 Mez ", i_rssi    ,  0.50,  0.30,    err_last) ; adc_errs.push_back(err_last)     ; currents.push_back(i_rssi);
+//    tok("Tgbtx     S6 Mez ", tgbtx_mez,  90.00, 0.2000,  err_last); adc_errs.push_back(err_last); temperatures.push_back(tgbtx_mez);
+//    }
+//    else if (alct_fpga_type==0x1516)
+//    {
+//    tok("+1.2V MGT S6 Mez " , vcore_mez   , 1.200 , 0.0250 , err_last); adc_errs.push_back(err_last); voltages.push_back(vcore_mez  );
+//    tok("Tsink     S6 Mez " , tsink_mez_f , 72.00 , .2000  , err_last); adc_errs.push_back(err_last); voltages.push_back(tsink_mez_f);
+//    }
+//
+//    tok("Tfpga     S6 Mez " , tfpga_mez_f , 72.00 , .2000  , err_last); adc_errs.push_back(err_last); voltages.push_back(tfpga_mez_f);
+//
+//    tok("+vref/2 S6 Mez ", vref2_mez,   1.250,       .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vref2_mez);
+//    tok("+vzero  S6 Mez ", vzero_mez,   0.0,         .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vzero_mez);
+//    tok("+vref   S6 Mez ", vref_mez,    2.499,       .0010,     err_last); adc_errs.push_back(err_last); voltages.push_back(vref_mez );
+//
+//    ipf=0;
+//	if (adc_errs.size() > 0 ) 
+//    for (i=0; i<int(adc_errs.size()); ++i)
+//        if (adc_errs[i]!=0) ipf=1;
+//
+//    if (ipf==0) alct_npassed[itest]=1;
+//    else        alct_nfailed[itest]=1;
+//
+//    // fprintf(stdout, "\t%2i Spartan6 ADC");
+//    // for (i=0; i<int(voltages.size()); ++i)
+//    //     fprintf(stdout, " %3.1fV", voltages[i]);
+//    // fprintf(stdout, "\n"); 
+//
+//    if (temperatures.size()>0)
+//    for (i=0; i<int(temperatures.size()); ++i)
+//        fprintf(stdout, " %3.0fF", temperatures[i]);
+//    fprintf(stdout, "\n"); 
+//
+//    fprintf(test_file, "\t%2i Spartan6 ADC");
+//    if (voltages.size()>0)
+//    for (i=0; i<int(voltages.size()); ++i)
+//        fprintf(test_file, " %3.1fV", voltages[i]);
+//    fprintf(stdout, "\n"); 
+//
+//    if (temperatures.size()>0)
+//    for (i=0; i<int(temperatures.size()); ++i)
+//        fprintf(test_file, " %3.0fF", temperatures[i]);
+//    fprintf(stdout, "\n"); 
+//
+//    if (currents.size()>0)
+//    for (i=0; i<int(currents.size()); ++i)
+//        fprintf(test_file, " %3.0fF", currents[i]);
+//    fprintf(stdout, "\n"); 
 
 //------------------------------------------------------------------------------
 //  Test ??: ALCT rxd clock delay scan: ALCT-to-TMB Teven|Todd
@@ -6509,7 +6727,7 @@ rx_scan:
             //  fprintf(unit,"Window center = %2i at tof=%2i posneg=%1i\n",window_center[alct_rxd_posneg][alct_tof_delay],alct_tof_delay,alct_rxd_posneg);
             //  fprintf(unit,"\n");
 
-            if (window_width[alct_rxd_posneg][alct_tof_delay]  >= 8) {alct_npassed[itest]=1; ipf=0;}
+            if (window_width[alct_rxd_posneg][alct_tof_delay]  >= 7) {alct_npassed[itest]=1; ipf=0;}
             else                                                     {alct_nfailed[itest]=1; ipf=1;}
 
             fprintf(stdout,"\t%2i ALCT rxd clock delay scan: Width=%2i Center=%2i    %s\n",
@@ -6811,17 +7029,17 @@ rx_scan:
     alct_sync_1st_err_ff[alct_txd_delay] = ((rd_data >> 8) & 0x1) | alct_sync_1st_err_ff[alct_txd_delay];
     alct_sync_2nd_err_ff[alct_txd_delay] = ((rd_data >> 9) & 0x1) | alct_sync_1st_err_ff[alct_txd_delay];
 
-//  if (ipass==1) {
-//  fprintf(unit,"Teven|Todd: alct_txd_delay=%2i 1st=%8.8X 2nd=%8.8X ",alct_txd_delay,alct_sync_rxdata_1st,alct_sync_rxdata_2nd);
-//  fprintf(unit,"1st_err=%1i/%1i 2nd_err=%1i/%1i\n",alct_sync_1st_err[alct_txd_delay],alct_sync_1st_err_ff[alct_txd_delay],alct_sync_2nd_err[alct_txd_delay],alct_sync_2nd_err_ff[alct_txd_delay]);
-//  }
+    if (ipass==1) {
+    dprintf(stdout,"Teven|Todd: alct_txd_delay=%2i 1st=%8.8X 2nd=%8.8X ",alct_txd_delay,alct_sync_rxdata_1st,alct_sync_rxdata_2nd);
+    dprintf(stdout,"1st_err=%1i/%1i 2nd_err=%1i/%1i\n",alct_sync_1st_err[alct_txd_delay],alct_sync_1st_err_ff[alct_txd_delay],alct_sync_2nd_err[alct_txd_delay],alct_sync_2nd_err_ff[alct_txd_delay]);
+    }
 
 // Compare received bits to expected pattern
     alct_1st_expect = 0x2AA;    // Teven
     alct_2nd_expect = 0x155;    // Todd
 
-    if (alct_1st_expect != alct_sync_expect_1st) {fprintf(unit,"TMB internal error: alct_1st_expect=%8.8X alct_sync_expect_1st=%8.8X\n",alct_1st_expect,alct_sync_expect_1st);}
-    if (alct_2nd_expect != alct_sync_expect_2nd) {fprintf(unit,"TMB internal error: alct_2nd_expect=%8.8X alct_sync_expect_2nd %8.8X\n",alct_2nd_expect,alct_sync_expect_2nd);}
+    if (alct_1st_expect != alct_sync_expect_1st) {fprintf(stdout,"TMB internal error: alct_1st_expect=%8.8X alct_sync_expect_1st=%8.8X\n",alct_1st_expect,alct_sync_expect_1st);}
+    if (alct_2nd_expect != alct_sync_expect_2nd) {fprintf(stdout,"TMB internal error: alct_2nd_expect=%8.8X alct_sync_expect_2nd %8.8X\n",alct_2nd_expect,alct_sync_expect_2nd);}
 
     for (ibit=0; ibit<=27; ++ibit) {
     ibit_1st_expected = (alct_1st_expect        >> ibit) & 0x1;
@@ -6846,37 +7064,46 @@ rx_scan:
     ngood_center=  0;
 
     for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {
-    good_spot= !(alct_sync_1st_err_ff[alct_txd_delay] || alct_sync_2nd_err_ff[alct_txd_delay]);
-    good_spots[alct_rxd_delay][alct_rxd_posneg][alct_txd_delay][alct_txd_posneg][alct_tof_delay]=good_spot;
-//  printf("alct_txd_delay=%2i good_spot=%1i\n",alct_txd_delay,good_spot);
+        good_spot= !(alct_sync_1st_err_ff[alct_txd_delay] || alct_sync_2nd_err_ff[alct_txd_delay]);
+        good_spots[alct_rxd_delay][alct_rxd_posneg][alct_txd_delay][alct_txd_posneg][alct_tof_delay]=good_spot;
+
+        dprintf("alct_txd_delay=%2i good_spot=%1i\n",alct_txd_delay,good_spot);
+
     }
 
     for (i=0; i<=(dps_max*2); ++i) {    // scan delays 0 to 25 twice to span the awkward 25 to 0 wrap around
-    alct_txd_delay=i%(dps_max+1);
-    good_spot=good_spots[alct_rxd_delay][alct_rxd_posneg][alct_txd_delay][alct_txd_posneg][alct_tof_delay];
-//  printf("alct_txd_delay=%2i good_spot=%1i\n",alct_txd_delay,good_spot);
-//  printf("i             =%2i good_spot=%1i\n",i,good_spot);
 
-    if  (good_spot==1) ngood++;         // this is a good spot
-    if ((good_spot==0) && (ngood>0)) {  // good spot just went away, so window preceeds it
-    ngood_max  = ngood;
-    ngood_edge = i;
-    ngood      = 0;
-    }   // close if
+        alct_txd_delay=i%(dps_max+1);
+        good_spot=good_spots[alct_rxd_delay][alct_rxd_posneg][alct_txd_delay][alct_txd_posneg][alct_tof_delay];
+
+        dprintf("alct_txd_delay=%2i good_spot=%1i\n",alct_txd_delay,good_spot);
+        dprintf("i             =%2i good_spot=%1i\n",i,good_spot);
+
+        if  (good_spot==1) ngood++;         // this is a good spot
+        if ((ngood >= ngood_max) && (good_spot==0) && (ngood>0)) {  // good spot just went away, so window preceeds it
+            ngood_max  = ngood;
+            ngood_edge = i;
+            ngood      = 0;
+        }   // close if
+
     }   // close for i
 
-    if (ngood_max>0) ngood_center=(dps_max+ngood_edge-(ngood_max/2))%(dps_max+1);
+    if (ngood_max>0) 
+        ngood_center=(dps_max+ngood_edge-(ngood_max/2))%(dps_max+1);
 
     window_width[alct_txd_posneg][alct_tof_delay]  = ngood_max;
     window_center[alct_txd_posneg][alct_tof_delay] = ngood_center;
 
-//  fprintf(unit,"Window width  = %2i at tof=%2i posneg=%1i\n",window_width[alct_txd_posneg][alct_tof_delay],alct_tof_delay,alct_txd_posneg);
-//  fprintf(unit,"Window center = %2i at tof=%2i posneg=%1i\n",window_center[alct_txd_posneg][alct_tof_delay],alct_tof_delay,alct_txd_posneg);
-//  fprintf(unit,"\n");
-//  fprintf(stdout," width=%2i center=%2i\n",window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay]);
-
     if (window_width[alct_txd_posneg][alct_tof_delay]  >= 7) {alct_npassed[itest]=1; ipf=0;}
     else                                                     {alct_nfailed[itest]=1; ipf=1;}
+
+    if (alct_nfailed[itest]==1) {
+        fprintf(stdout,"Window width  = %2i at tof=%2i posneg=%1i\n",window_width[alct_txd_posneg][alct_tof_delay],alct_tof_delay,alct_txd_posneg);
+        fprintf(stdout,"Window center = %2i at tof=%2i posneg=%1i\n",window_center[alct_txd_posneg][alct_tof_delay],alct_tof_delay,alct_txd_posneg);
+        fprintf(stdout,"\n");
+        fprintf(stdout," width=%2i center=%2i\n",window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay]);
+    }
+
 
     fprintf(stdout,"\t%2i ALCT txd clock delay scan: Width=%2i Center=%2i    %s\n",
     itest, window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay],spass_fail[ipf].c_str());
@@ -6884,9 +7111,11 @@ rx_scan:
     fprintf(test_file,"%2i ALCT txd clock delay scan: Width=%2i Center=%2i    %s\n",
     itest, window_width[alct_txd_posneg][alct_tof_delay],window_center[alct_txd_posneg][alct_tof_delay],spass_fail[ipf].c_str());
 
-// Display timing window twice in case good area is near 0 or 25ns
-//  fprintf(unit,"Txd    \n");
-//  fprintf(unit,"Step   Berrs Average 12 01234567890123456789012345678  %5i samples\n",npasses);
+    // Display timing window twice in case good area is near 0 or 25ns
+    if (alct_nfailed[itest]==1) {
+        fprintf(stdout,"Txd    \n");
+        fprintf(stdout,"Step   Berrs Average 12 01234567890123456789012345678  %5i samples\n",npasses);
+    }
 
     for (j=0; j<=1; ++j) {
     for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {
@@ -6895,46 +7124,52 @@ rx_scan:
     avgbad=double(nbad)/double(npasses);
     nx=int(avgbad);
     if ((nx==0) && (nbad != 0)) nx=1;
-//  fprintf(unit,"%2i  %8i %7.4f %c%c |",alct_txd_delay,nbad,avgbad,passfail[alct_sync_1st_err_ff[alct_txd_delay]],passfail[alct_sync_2nd_err_ff[alct_txd_delay]]);
-//  if (nbad!=0) for(i=1; i<=nx; ++i) fprintf(unit,"x");
-//  if (alct_txd_delay==window_center[alct_txd_posneg][alct_tof_delay]) fprintf(unit,"\t\t\t\t<--Center");
-//  fprintf(unit,"\n");
+    if (alct_nfailed[itest]==1) {
+        fprintf(stdout,"%2i  %8i %7.4f %c%c |",alct_txd_delay,nbad,avgbad,passfail[alct_sync_1st_err_ff[alct_txd_delay]],passfail[alct_sync_2nd_err_ff[alct_txd_delay]]);
+    }
+    if (nbad!=0) for(i=1; i<=nx; ++i) dprintf(stdout,"x");
+    if (alct_txd_delay==window_center[alct_txd_posneg][alct_tof_delay]) dprintf(stdout,"\t\t\t\t<--Center");
+    if (alct_nfailed[itest]==1) {
+        fprintf(stdout,"\n");
+    }
     }}
 
-// Display bad bits vs delay
-//  fprintf(unit,"\nCable Pair Errors vs alct_txd_clock Delay Step\n");
+    // Display bad bits vs delay
+    if (alct_nfailed[itest]==1) {
+        fprintf(stdout,"\nCable Pair Errors vs alct_txd_clock Delay Step\n");
 
-//  fprintf(unit," delay ");
-//  for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {fprintf(unit,"%5i",alct_txd_delay);} // display delay values header
-//  fprintf(unit,"\n");
+        fprintf(stdout," delay ");
+        for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {fprintf(stdout,"%5i",alct_txd_delay);} // display delay values header
+        fprintf(stdout,"\n");
 
-//  fprintf(unit,"pair   ");
-//  for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {fprintf(unit," ----");}
-//  fprintf(unit,"\n");
+        fprintf(stdout,"pair   ");
+        for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {fprintf(stdout," ----");}
+        fprintf(stdout,"\n");
 
-//  for (ibit=0; ibit<=27; ++ibit) {
-//  fprintf(unit,"tx[%2i] ",ibit);
-//  for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {fprintf(unit,"%5i",alct_txd_bad[alct_txd_delay][ibit]);}
-//  fprintf(unit,"\n");
-//  }
+        for (ibit=0; ibit<=27; ++ibit) {
+        fprintf(stdout,"tx[%2i] ",ibit);
+        for (alct_txd_delay=0; alct_txd_delay<=dps_max; ++alct_txd_delay) {fprintf(stdout,"%5i",alct_txd_bad[alct_txd_delay][ibit]);}
+        fprintf(stdout,"\n");
+        }
+    }
 
 // Close scan loops
     }   // alct_tof_delay
     }   // alct_txd_posneg
 
 // Display window center and width vs tof and posneg
-//  fprintf(unit,"\n");
+//  fprintf(stdout,"\n");
     for (alct_txd_posneg = alct_txd_posneg_min; alct_txd_posneg <= alct_txd_posneg_max; ++alct_txd_posneg) {
     for (alct_tof_delay  = alct_tof_delay_min;  alct_tof_delay  <= alct_tof_delay_max;  ++alct_tof_delay ) {
 
-//  fprintf(unit,"Tof=%2i Posneg=%1i Window center=%2i  width=%2i\n",
+//  fprintf(stdout,"Tof=%2i Posneg=%1i Window center=%2i  width=%2i\n",
 //  alct_tof_delay,alct_txd_posneg,
 //  window_center[alct_txd_posneg][alct_tof_delay],
 //  window_width[alct_txd_posneg][alct_tof_delay]);
 
     newcenter=window_center[alct_txd_posneg][alct_tof_delay];
     }
-//  fprintf(unit,"\n");
+//  fprintf(stdout,"\n");
     }
 
 // Set alct txd delay and posneg to new value or restore default
@@ -7627,8 +7862,14 @@ alct_auto_done:
     fprintf(test_file,"\t+-----------------------+\n");
     }
 
+
+    //sam_song(); 
+
     if (test_file!=NULL) fclose(test_file);
     pause ("Return to main menu [cr}");
+
+
+
     return;
 }
 //------------------------------------------------------------------------------
@@ -8562,8 +8803,8 @@ L23810:
     status = 0; // good return
     if (data_read != data_expect) {
     status = 1; // bad return
-    fprintf(stdout,  "\t\t > ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
-    fprintf(log_file,"\t\t > ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
+    fprintf(stdout,  "\t\t> ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
+    fprintf(log_file,"\t\t> ERRm: in %s: read=%8.8X expect=%8.8X\n",msg_string.c_str(),data_read,data_expect);
 //  pause(" ");
     }
 
@@ -8583,8 +8824,8 @@ L23810:
     status=0;
     if (abs(err)>tolerance) {
     status=1;
-    fprintf(stdout,  "\t> ERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
-    fprintf(log_file,"\t> ERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
+    fprintf(stdout,  "\t\t> ERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
+    fprintf(log_file,"\t\t> ERRm: in %s: read=%10.4g expect=%10.4g %10.2f\n",msg_string.c_str(),fdata_read,fdata_expect,errpct);
     }
 
     return;
@@ -8913,6 +9154,123 @@ std::string get_alct_fpga_type_string () {
     else if (alct_fpga==0x1516) return "Spartan-6 LX150T";
     else if (alct_fpga==0x1006) return "Spartan-6 LX100";
     else                        return "Unknown";
+}
+
+void turkey_in_the_straw () {
+
+    Beep(n_E5,150);
+    Beep(n_D5,150);
+    Beep(n_C5,250);
+    _sleep(50);
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_C5,150);
+    Beep(n_G4,150);
+    Beep(n_E4,150);
+    Beep(n_F4,150);
+    Beep(n_G4,150);
+    Beep(n_A4,150);
+    Beep(n_G4,150);
+    Beep(n_E4,150);
+    Beep(n_G4,300);
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_E5,250);
+    _sleep(50);
+    Beep(n_E5,250);
+    _sleep(50);
+    Beep(n_E5,150);
+
+    Beep(n_D5,150);
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_E5,300);
+    Beep(n_D5,250);
+    _sleep(50);
+    Beep(n_D5,300);
+
+    Beep(n_E5,150);
+    Beep(n_D5,150);
+    Beep(n_C5,300);
+    _sleep(50);
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_C5,150);
+    Beep(n_G4,150);
+    Beep(n_E4,150);
+    Beep(n_F4,150);
+    Beep(n_G4,150);
+    Beep(n_A4,150);
+    Beep(n_G4,150);
+    Beep(n_E4,150);
+    Beep(n_G4,300);
+
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_E5,150);
+
+    Beep(n_G5,300);
+    Beep(n_A5,150);
+    Beep(n_G5,150);
+    Beep(n_E5,150);
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_E5,300);
+    Beep(n_D5,300);
+    Beep(n_C5,300);
+}
+
+void sam_song () {
+
+    Beep(n_C6,150);
+    Beep(n_B5,150);
+
+    Beep(n_A5,300);
+    Beep(n_G5,300);
+    Beep(n_E5,300);
+    Beep(n_C5,300);
+
+    Beep(n_D5,150);
+    Beep(n_E5,150);
+    Beep(n_D5,150);
+    Beep(n_C5,150);
+    Beep(n_A4,300);
+    Beep(n_G4,150);
+    Beep(n_A4,150);
+
+    Beep(n_C5,250);
+    _sleep(50);
+    Beep(n_C5,250);
+    _sleep(50);
+    Beep(n_C5,150);
+    Beep(n_D5,150);
+    Beep(n_E5,150);
+    Beep(n_F5,150);
+
+    Beep(n_G5,600);
+    Beep(n_E5,300);
+    Beep(n_C6,150);
+    Beep(n_B5,150);
+
+    Beep(n_A5,300);
+    Beep(n_G5,300);
+    Beep(n_E5,300);
+    Beep(n_C5,300);
+
+    Beep(n_D5,150);
+    Beep(n_E5,150);
+    Beep(n_D5,150);
+    Beep(n_C5,150);
+    Beep(n_A4,300);
+    Beep(n_C5,300);
+
+    Beep(n_B4,300);
+    Beep(n_D5,300);
+    Beep(n_G4,300);
+    Beep(n_A4,150);
+    Beep(n_B4,150);
+
+    Beep(n_C5,1200);
 }
 //------------------------------------------------------------------------------
 // The bitter end
